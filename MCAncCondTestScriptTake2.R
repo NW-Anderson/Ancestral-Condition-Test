@@ -4,7 +4,7 @@ library(diversitree)
 library(geiger)
 library(doSNOW)
 library(foreach)
-cl<-makeCluster(1)
+cl<-makeCluster(3)
 on.exit(stopCluster(cl))
 
 
