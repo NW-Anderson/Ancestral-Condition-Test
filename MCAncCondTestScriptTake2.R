@@ -108,7 +108,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
           if((0.1 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
              sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa)){
             good.sim <- T
-            if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim')}
+            if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
           }
           if(message == T && count %% 50 == 0){cat(min(disc.trait), 
                                                    max(disc.trait), 
@@ -116,7 +116,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                                    sum(disc.trait == min(disc.trait)), 
                                                    '      ')}
           count <- count + 1
-        }}, timeout = 60, onTimeout = "error")
+        }}, timeout = 600, onTimeout = "error")
         if(message == T){cat('\n')}
         # we now apply the AncCond test to our simulated data and record its result
         dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
@@ -127,11 +127,11 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                      mat = c(0,0,1,0), 
                                      pi = c(1,0), 
                                      message = F)}, 
-                    timeout = 360, onTimeout = "error")
+                    timeout = 600, onTimeout = "error")
         # saving results in arrays
         #p.val.array[t,s] <- rslt$pval
         p.val.vec[s] <- rslt$pval
-        if(message == T){cat('s = ', s)}
+        if(message == T){cat(' s = ', s)}
       }
       if(message == T){cat('\n')}
       # closting the while loop if all goes well
@@ -141,7 +141,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
   p.val.vec
   if(message == T){
     cat('\n')
-    cat('t = ', t)
+    cat(' t = ', t)
   }
 }
 fig2.data <- p.val.array
@@ -245,7 +245,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
             if((0.1 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
                sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa)){
               good.sim <- T
-              if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim')}
+              if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
             }
             if(message == T && count %% 50 == 0){cat(min(disc.trait), 
                                                      max(disc.trait), 
@@ -253,7 +253,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
                                                      sum(disc.trait == min(disc.trait)), 
                                                      '      ')}
             count <- count + 1
-          }}, timeout = 60, onTimeout = "error")
+          }}, timeout = 360, onTimeout = "error")
           if(message == T){cat('\n')}
           # we now apply the AncCond test to our simulated data and record its result
           dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
@@ -264,7 +264,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
                                        mat = c(0,0,1,0), 
                                        pi = c(1,0), 
                                        message = F)}, 
-                      timeout = 360, onTimeout = "error")
+                      timeout = 600, onTimeout = "error")
           # saving results in arrays
           # p.val.array[t,s] <- rslt$pval
         
@@ -275,13 +275,13 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
     }
     if(message == T){
       cat('\n')
-      cat('t = ', t)
+      cat(' t = ', t)
     }
     p.val.vec[t] <- rslt$pval
   }
   if(message == T){
     cat('\n')
-    cat('s = ', s)
+    cat(' s = ', s)
   }
 }
 fig3.data <- p.val.array
