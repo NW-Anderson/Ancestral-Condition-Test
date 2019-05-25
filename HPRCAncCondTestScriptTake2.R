@@ -291,7 +291,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
     cat('\n')
     cat(' s = ', s)
   }
-  end <- sys.time
+  # end <- sys.time
 }
 fig3.data <- p.val.array
 save(fig3.data, file = 'fig3Data.RData')
