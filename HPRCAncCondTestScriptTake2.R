@@ -1,21 +1,21 @@
 install.packages(c("phytools","diversitree","geiger"))
-install.packages("Rmpi")
+# install.packages(c("Rmpi", 'doMPI'))
 library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doMPI)
-library(Rmpi)
-library(iterators)
-# library(doSNOW)
+# library(doMPI)
+# library(Rmpi)
+# library(iterators)
+library(doSNOW)
 library(foreach)
-# cl<-makeCluster(3)
-# on.exit(stopCluster(cl))
+cl<-makeCluster(3)
+on.exit(stopCluster(cl))
 
 
 source('AncCond.R')
 
-n.trees <- 200
+n.trees <- 100
 n.taxa <- 200
 
 
@@ -29,6 +29,8 @@ message <- T
 opts <- list(preschedule = FALSE)
 registerDoSNOW(cl)
 p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind') %dopar%{
+  # ~50 min
+  # start <- Sys.time()
   p.val.vec <- c()
   good.tree <- F
   while(good.tree == F){
@@ -121,7 +123,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                                    sum(disc.trait == min(disc.trait)), 
                                                    '      ')}
           count <- count + 1
-        }}, timeout = 600, onTimeout = "error")
+        }}, timeout = 1200, onTimeout = "error")
         if(message == T){cat('\n')}
         # we now apply the AncCond test to our simulated data and record its result
         dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
@@ -132,7 +134,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                      mat = c(0,0,1,0), 
                                      pi = c(1,0), 
                                      message = F)}, 
-                    timeout = 600, onTimeout = "error")
+                    timeout = 1200, onTimeout = "error")
         # saving results in arrays
         #p.val.array[t,s] <- rslt$pval
         p.val.vec[s] <- rslt$pval
@@ -148,6 +150,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
     cat('\n')
     cat(' t = ', t)
   }
+  # end <- Sys.time()
 }
 fig2.data <- p.val.array
 save(fig2.data, file = 'fig2Data.RData')
@@ -288,6 +291,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind')
     cat('\n')
     cat(' s = ', s)
   }
+  end <- sys.time
 }
 fig3.data <- p.val.array
 save(fig3.data, file = 'fig3Data.RData')
