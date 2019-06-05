@@ -9,12 +9,12 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
-library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+# library(doSNOW)
+# library(foreach)
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoSNOW(cl)
 
 n.trees <- 100
 n.taxa <- 200
@@ -25,7 +25,7 @@ source('AncCond.R', local = TRUE) #### Move inside for HPRC
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
 # dont need this for mc
-# p.val.array <- array(dim = c(n.trees, 10))
+p.val.array <- array(dim = c(n.trees, 10))
 
 
 
@@ -151,7 +151,7 @@ for(t in 1:n.trees){
     cat('\n')
     cat(' t = ', t)
   }
-  p.val.vec
+  p.val.array[t,] <- p.val.vec
   # end <- Sys.time()
 }
 fig2.data <- p.val.array
