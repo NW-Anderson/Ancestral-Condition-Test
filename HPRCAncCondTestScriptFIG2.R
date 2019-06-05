@@ -1,7 +1,7 @@
 HPRCAncCondFIG2 <- function(){
-  install.packages("phytools")
-  install.packages("diversitree")
-  install.packages("geiger")
+  # install.packages("phytools")
+  # install.packages("diversitree")
+  # install.packages("geiger")
   # install.packages(c("Rmpi", 'doMPI'))
   # library(doMPI)
   # library(Rmpi)
@@ -11,9 +11,10 @@ HPRCAncCondFIG2 <- function(){
   library(geiger)
   library(doSNOW)
   library(foreach)
-  cl<-makeCluster(28)
+  cl<-makeCluster(28, type="SOCK")
   on.exit(stopCluster(cl))
-  source('AncCond.R')
+  opts <- list(preschedule = FALSE)
+  registerDoSNOW(cl)
   
   n.trees <- 100
   n.taxa <- 200
@@ -26,11 +27,11 @@ HPRCAncCondFIG2 <- function(){
   # p.val.array <- array(dim = c(n.trees, 10))
   message <- T
   
-  opts <- list(preschedule = FALSE)
-  registerDoSNOW(cl)
-  p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind') %dopar%{
+  
+  p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind', .packages=c("phytools","diversitree","geiger")) %dopar%{
     # ~50 min
     # start <- Sys.time()
+    source('AncCond.R', local = TRUE)
     p.val.vec <- c()
     good.tree <- F
     while(good.tree == F){
@@ -104,13 +105,14 @@ HPRCAncCondFIG2 <- function(){
           good.sim <- F
           count <- 0
           rate <- .02
-          withTimeout({while(good.sim == F){
+          # withTimeout({
+          while(good.sim == F){
             disc.trait <- sim.char(phy = alt.tree, 
                                    par = matrix(c(-rate, 0, rate, 0), 2), 
                                    model = 'discrete', 
                                    root = 1)
-            if((0.1 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
-               sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa)){
+            if((0.25 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
+               sum(disc.trait == min(disc.trait)) < (0.75 * n.taxa)){
               good.sim <- T
               if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
             }
@@ -120,17 +122,18 @@ HPRCAncCondFIG2 <- function(){
                                                      sum(disc.trait == min(disc.trait)), 
                                                      '      ')}
             count <- count + 1
-          }}, timeout = 1200, onTimeout = "error")
+          }# }, timeout = 1200, onTimeout = "error")
           if(message == T){cat('\n')}
           # we now apply the AncCond test to our simulated data and record its result
           dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
-          withTimeout({rslt <- AncCond(trees = trees, 
-                                       data = dat, 
-                                       drop.state = 2, 
-                                       mat = c(0,0,1,0), 
-                                       pi = c(1,0), 
-                                       message = F)}, 
-                      timeout = 1200, onTimeout = "error")
+          # withTimeout({
+          rslt <- AncCond(trees = trees, 
+                          data = dat, 
+                          drop.state = 2, 
+                          mat = c(0,0,1,0), 
+                          pi = c(1,0), 
+                          message = F)# }, 
+          # timeout = 1200, onTimeout = "error")
           # saving results in arrays
           #p.val.array[t,s] <- rslt$pval
           p.val.vec[s] <- rslt$pval
@@ -146,9 +149,11 @@ HPRCAncCondFIG2 <- function(){
       cat('\n')
       cat(' t = ', t)
     }
-    # end <- Sys.time()
+    end <- Sys.time()
   }
   fig2.data <- p.val.array
-  save(fig2.data, file = 'fig2Data.RData')
+  save(fig2.data, file = 'AncCondFig2Data.RData')
   ##### END FIGURE 2 #####
 }
+
+HPRCAncCondFIG2()

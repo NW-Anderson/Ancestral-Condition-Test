@@ -11,7 +11,7 @@ HPRCAncCondFIG4 <- function(){
   library(geiger)
   library(doSNOW)
   library(foreach)
-  cl<-makeCluster(28)
+  cl<-makeCluster(28, type="SOCK")
   on.exit(stopCluster(cl))
   opts <- list(preschedule = FALSE)
   registerDoSNOW(cl)
@@ -28,7 +28,7 @@ HPRCAncCondFIG4 <- function(){
   
   
   p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind', .packages=c("phytools","diversitree","geiger")) %dopar%{
-    source('AncCond.R', type="SOCK")
+    source('AncCond.R', local = TRUE)
     # ~50 min
     # start <- Sys.time()
     p.val.vec <- c()
@@ -150,3 +150,5 @@ HPRCAncCondFIG4 <- function(){
   save(fig4.data, file = 'AncCondFig4Data.RData')
   ##### END FIGURE 2 #####
 }
+
+HPRCAncCondFIG4()

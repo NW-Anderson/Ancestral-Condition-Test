@@ -1,4 +1,4 @@
-HPRCAncCondFIG3 <- function(){
+# HPRCAncCondFIG3 <- function(){
   # install.packages("phytools")
   # install.packages("diversitree")
   # install.packages("geiger")
@@ -11,7 +11,7 @@ HPRCAncCondFIG3 <- function(){
   library(geiger)
   library(doSNOW)
   library(foreach)
-  cl<-makeCluster(28, type="SOCK")
+  cl<-makeCluster(3, type="SOCK")
   on.exit(stopCluster(cl))
   opts <- list(preschedule = FALSE)
   registerDoSNOW(cl)
@@ -21,17 +21,18 @@ HPRCAncCondFIG3 <- function(){
   n.trees <- 100
   scaling.factor <- 5
   n.taxa <- seq(0, 180, length.out = 10)
-  
-  
+  message <- T
+  source('AncCond.R', local = TRUE)
   ##### Making fig3 ######
   
   ## this will hold the p.val for each of 100 tests for the 10 tree sizes
   # p.val.array <- array(dim = c(n.trees, 10))
-  message <- T
+  
   # this time we vary the size of the tree
   
-  p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind', .packages=c("phytools","diversitree","geiger")) %dopar%{
-    source('AncCond.R', local = TRUE)
+  p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind', 
+                        .packages=c("phytools","diversitree","geiger")) %dopar%{
+    
     p.val.vec <- c()
     # for each tree size we repeat the same analysis for the same number of trees
     for(t in 1:n.trees){
@@ -40,7 +41,7 @@ HPRCAncCondFIG3 <- function(){
         # some trees take a real long time for simulating discrete traits due to incredibly short branch lengths where a transition 
         #   must occur. To get around this we added a timeout and trycatch. In the event of a tree that is taking an unacceptable time,
         #   we begin back here by resimulating a tree
-        tryCatch({
+        # tryCatch({
           # We begin with a single tree and test it at every scaling factor then move to the next tree
           # first the tree
           trees <- trees(pars = c(3,1),
@@ -104,7 +105,8 @@ HPRCAncCondFIG3 <- function(){
           good.sim <- F
           count <- 0
           rate <- .02
-          withTimeout({while(good.sim == F){
+          # withTimeout({
+            while(good.sim == F){
             disc.trait <- sim.char(phy = alt.tree, 
                                    par = matrix(c(-rate, 0, rate, 0), 2), 
                                    model = 'discrete', 
@@ -120,24 +122,25 @@ HPRCAncCondFIG3 <- function(){
                                                      sum(disc.trait == min(disc.trait)), 
                                                      '      ')}
             count <- count + 1
-          }}, timeout = 360, onTimeout = "error")
+          } # }, timeout = 360, onTimeout = "error")
           if(message == T){cat('\n')}
           # we now apply the AncCond test to our simulated data and record its result
           dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
-          withTimeout({rslt <- AncCond(trees = trees, 
+          # withTimeout({
+            rslt <- AncCond(trees = trees, 
                                        data = dat, 
                                        drop.state = 2, 
                                        mat = c(0,0,1,0), 
                                        pi = c(1,0), 
-                                       message = F)}, 
-                      timeout = 600, onTimeout = "error")
+                                       message = F)# }, 
+                      # timeout = 600, onTimeout = "error")
           # saving results in arrays
           # p.val.array[t,s] <- rslt$pval
           
           if(message == T){cat('\n')}
           # closting the while loop if all goes well
           good.tree <- T
-        }, error = function(e){good.tree <- F})
+        # }, error = function(e){good.tree <- F})
       }
       if(message == T){
         cat('\n')
@@ -149,10 +152,11 @@ HPRCAncCondFIG3 <- function(){
       cat('\n')
       cat(' s = ', s)
     }
+    p.val.vec
     # end <- sys.time
   }
   fig3.data <- p.val.array
   save(fig3.data, file = 'AncCondFig3Data.RData')
   #######
-}
-HPRCAncCondFIG3()
+# }
+# HPRCAncCondFIG3()

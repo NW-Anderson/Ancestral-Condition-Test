@@ -1,7 +1,7 @@
 HPRCAncCondFIG5 <- function{
-  install.packages("phytools")
-  install.packages("diversitree")
-  install.packages("geiger")
+  # install.packages("phytools")
+  # install.packages("diversitree")
+  # install.packages("geiger")
   # install.packages(c("Rmpi", 'doMPI'))
   library(R.utils)
   library(phytools)
@@ -17,8 +17,8 @@ HPRCAncCondFIG5 <- function{
   library(foreach)
   cl<-makeCluster(28)
   on.exit(stopCluster(cl))
-  source('AncCond.R')
-  
+  opts <- list(preschedule = FALSE)
+  registerDoSNOW(cl)
   
   
   n.trees <- 100
@@ -32,9 +32,9 @@ HPRCAncCondFIG5 <- function{
   # p.val.array <- array(dim = c(n.trees, 10))
   message <- T
   # this time we vary the size of the tree
-  opts <- list(preschedule = FALSE)
-  registerDoSNOW(cl)
-  p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind') %dopar%{
+  
+  p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind', .packages=c("phytools","diversitree","geiger")) %dopar%{
+    source('AncCond.R', type="SOCK")
     p.val.vec <- c()
     # for each tree size we repeat the same analysis for the same number of trees
     for(t in 1:n.trees){
@@ -152,6 +152,6 @@ HPRCAncCondFIG5 <- function{
     # end <- sys.time
   }
   fig5.data <- p.val.array
-  save(fig5.data, file = 'fig5Data.RData')
+  save(fig5.data, file = 'AncCondFig5Data.RData')
   #######
 }

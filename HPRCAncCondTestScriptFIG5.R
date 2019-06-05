@@ -1,4 +1,4 @@
-HPRCAncCondFIG3 <- function(){
+HPRCAncCondFIG5 <- function(){
   # install.packages("phytools")
   # install.packages("diversitree")
   # install.packages("geiger")
@@ -15,7 +15,6 @@ HPRCAncCondFIG3 <- function(){
   on.exit(stopCluster(cl))
   opts <- list(preschedule = FALSE)
   registerDoSNOW(cl)
-  
   
   
   n.trees <- 100
@@ -106,7 +105,7 @@ HPRCAncCondFIG3 <- function(){
           rate <- .02
           withTimeout({while(good.sim == F){
             disc.trait <- sim.char(phy = alt.tree, 
-                                   par = matrix(c(-rate, 0, rate, 0), 2), 
+                                   par = matrix(c(-rate, rate, rate, -rate), 2), 
                                    model = 'discrete', 
                                    root = 1)
             if((0.1 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
@@ -126,9 +125,6 @@ HPRCAncCondFIG3 <- function(){
           dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
           withTimeout({rslt <- AncCond(trees = trees, 
                                        data = dat, 
-                                       drop.state = 2, 
-                                       mat = c(0,0,1,0), 
-                                       pi = c(1,0), 
                                        message = F)}, 
                       timeout = 600, onTimeout = "error")
           # saving results in arrays
@@ -151,8 +147,8 @@ HPRCAncCondFIG3 <- function(){
     }
     # end <- sys.time
   }
-  fig3.data <- p.val.array
-  save(fig3.data, file = 'AncCondFig3Data.RData')
+  fig5.data <- p.val.array
+  save(fig5.data, file = 'AncCondFig5Data.RData')
   #######
 }
-HPRCAncCondFIG3()
+HPRCAncCondFIG5()

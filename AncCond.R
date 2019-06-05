@@ -27,8 +27,8 @@
 
 ## pi same values possible as make.simmap: "equal", "estimated" vector length
 ## 2 with probabilities for each state
-pi <- c(1,0)
-drop.state <- 2
+# pi <- c(1,0)
+# drop.state <- 2
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", message = T) {
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
@@ -103,7 +103,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   
   bigger <- (sum(null.orig.val >= orig.val) / mc)
   smaller <- (sum(null.orig.val <= orig.val) / mc)
-  if (bigger < smaller){pval <- bigger}
+  if (bigger <= smaller){pval <- bigger}
   if (smaller < bigger){pval <- smaller}
   ## print results to terminal
   if(message == T){cat(paste(
