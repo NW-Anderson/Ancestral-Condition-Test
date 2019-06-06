@@ -31,12 +31,12 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                       .packages=c("phytools","diversitree","geiger")) %dopar%{
                         # ~50 min
                         # start <- Sys.time()
-                        cnt <- 0
-                        while(T == T){
+                        # cnt <- 0
+                        # while(T == T){
                           p.val.vec <- c()
                           good.tree <- F
-                          cnt <- cnt + 1
-                          cat(cnt, '\n\n')
+                        #  cnt <- cnt + 1
+                        #  cat(cnt, '\n\n')
                           while(good.tree == F){
                             # some trees take a real long time for simulating discrete traits due to incredibly short branch lengths where a transition 
                             #   must occur. To get around this we added a timeout and trycatch. In the event of a tree that is taking an unacceptable time,
@@ -145,7 +145,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                             # closting the while loop if all goes well
                             good.tree <- T
                             #}, error = function(e){good.tree <- F})
-                          }}
+                          } # }
                         if(message == T){
                           cat('\n')
                           cat(' t = ', t)
