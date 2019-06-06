@@ -18,8 +18,8 @@ registerDoSNOW(cl)
 
 
 n.trees <- 100
-scaling.factor <- 5
-n.taxa <- seq(0, 180, length.out = 10)
+scale.factor <- 5
+n.taxa <- seq(20, 200, length.out = 10)
 source('AncCond.R', local = TRUE)
 message <- T
 ##### Making fig3 ######
@@ -29,7 +29,7 @@ message <- T
 
 # this time we vary the size of the tree
 
-p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind', 
+p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 'cbind', 
                       .packages=c("phytools","diversitree","geiger")) %dopar%{
                         
                         p.val.vec <- c()
@@ -46,7 +46,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind',
                             trees <- trees(pars = c(3,1),
                                            type = "bd",
                                            n = 1,
-                                           max.taxa = n.taxa,
+                                           max.taxa = n.taxa[s],
                                            include.extinct = F)[[1]]
                             trees$edge.length <- trees$edge.length / max(branching.times(trees))
                             
@@ -70,14 +70,14 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind',
                               node.o.int <- trees$edge[j,1]
                               # we have to look in two different places for cont trait values, either in the cont.trait vector 
                               # (if the node is a tip) or in the ASR if it is an interior node
-                              if(node.o.int <= n.taxa){
+                              if(node.o.int <= n.taxa[s]){
                                 one <- cont.trait[node.o.int]
                               }else{
                                 one <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
                               }
                               # we do the same for the tipward node
                               node.o.int <- trees$edge[j,2]
-                              if(node.o.int <= n.taxa){
+                              if(node.o.int <= n.taxa[s]){
                                 two <- cont.trait[node.o.int]
                               }else{
                                 two <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
@@ -94,6 +94,7 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind',
                             upper <- summary(branch.means)[[4]]
                             lower <- summary(branch.means)[[2]]
                             
+                            alt.tree <- trees
                             # we then manipulate the branch lengths of those branches whose cont trait means are in the upper or lower quartiles
                             for(j in 1:length(branch.means)){
                               if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
@@ -110,8 +111,8 @@ p.val.array <-foreach(s = 1:n.taxa, .options.multicore=opts, .combine = 'cbind',
                                                      par = matrix(c(-rate, rate, rate, -rate), 2), 
                                                      model = 'discrete', 
                                                      root = 1)
-                              if((0.1 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
-                                 sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa)){
+                              if((0.1 * n.taxa[s]) < sum(disc.trait == min(disc.trait)) && 
+                                 sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa[s])){
                                 good.sim <- T
                                 if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
                               }
