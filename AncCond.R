@@ -96,6 +96,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   }
   
   for (j in 1:mc){
+    # set.seed(j)
     null.orig.val[j] <- mean(sample(anc.cond.nodes,
                                     length(producing.nodes)))
   }
