@@ -25,7 +25,7 @@ source('AncCond.R', local = TRUE) #### Move inside for HPRC
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
 # dont need this for mc
-# p.val.array <- array(dim = c(n.trees, 10))
+p.val.array <- array(dim = c(n.trees, 10))
 
 
 
@@ -106,14 +106,18 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
                           # count <- 0
-                          rate <- .04
+                          rate <- .05
                           # withTimeout({
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree,
                                                    par = matrix(c(-rate, 0, rate, 0), 2),
                                                    model = 'discrete',
                                                    root = 1)
-                            if(sum(disc.trait == min(disc.trait)) < 195){good.sim <- T}
+                            if((0.05 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
+                               sum(disc.trait == min(disc.trait)) < (.95 * n.taxa)){
+                              good.sim <- T
+                              # if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
+                            }
                             # if((0.25 * n.taxa) < sum(disc.trait == min(disc.trait)) &&
                             #    sum(disc.trait == min(disc.trait)) < (0.75 * n.taxa)){
                             #   good.sim <- T
