@@ -92,7 +92,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           names(branch.means) <- branch.names
                           rm(branch.names)
                           # finding upper and lower quartiles
-                          upper <- summary(branch.means)[[4]]
+                          upper <- summary(branch.means)[[5]]
                           lower <- summary(branch.means)[[2]]
                           
                           alt.tree <- trees
@@ -105,15 +105,15 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
                           # count <- 0
-                          rate <- .04
+                          rate <- .1
                           # withTimeout({
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
                                                    par = matrix(c(-rate, 0, rate, 0), 2), 
                                                    model = 'discrete', 
                                                    root = 1)
-                            if((0.025 * n.taxa[s]) < sum(disc.trait == min(disc.trait)) && 
-                               sum(disc.trait == min(disc.trait)) < (.975 * n.taxa[s])){
+                            if(10 < sum(disc.trait == min(disc.trait)) && 
+                               sum(disc.trait == min(disc.trait)) < (n.taxa[s] - 10)){
                               good.sim <- T
                               # if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
                             }
@@ -157,7 +157,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                         # end <- sys.time
                       }
 fig3.data <- p.val.array
-save(fig3.data, file = 'AncCondFig3Data.RData')
+save(fig3.data, file = 'AncCondFig3DataPostBlackmon.RData')
 #######
 # }
 # HPRCAncCondFIG3()
