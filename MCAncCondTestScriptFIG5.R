@@ -91,7 +91,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             names(branch.means) <- branch.names
                             rm(branch.names)
                             # finding upper and lower quartiles
-                            upper <- summary(branch.means)[[4]]
+                            upper <- summary(branch.means)[[5]]
                             lower <- summary(branch.means)[[2]]
                             
                             alt.tree <- trees
@@ -104,24 +104,24 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             # while loop is set up to make sure sufficient transitions occur on the tree
                             good.sim <- F
                             count <- 0
-                            rate <- .02
+                            rate <- .1
                             # withTimeout({
                             while(good.sim == F){
                               disc.trait <- sim.char(phy = alt.tree, 
                                                      par = matrix(c(-rate, rate, rate, -rate), 2), 
                                                      model = 'discrete', 
                                                      root = 1)
-                              if((0.1 * n.taxa[s]) < sum(disc.trait == min(disc.trait)) && 
-                                 sum(disc.trait == min(disc.trait)) < (0.9 * n.taxa[s])){
+                              if((0.025 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
+                                 sum(disc.trait == min(disc.trait)) < (.975 * n.taxa)){
                                 good.sim <- T
-                                if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
+                                # if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
                               }
-                              if(message == T && count %% 50 == 0){cat(min(disc.trait), 
-                                                                       max(disc.trait), 
-                                                                       '    ', 
-                                                                       sum(disc.trait == min(disc.trait)), 
-                                                                       '      ')}
-                              count <- count + 1
+                              # if(message == T && count %% 50 == 0){cat(min(disc.trait), 
+                              #                                          max(disc.trait), 
+                              #                                          '    ', 
+                              #                                          sum(disc.trait == min(disc.trait)), 
+                              #                                          '      ')}
+                              # count <- count + 1
                             } #}, timeout = 360, onTimeout = "error")
                             if(message == T){cat('\n')}
                             # we now apply the AncCond test to our simulated data and record its result
@@ -143,7 +143,11 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             cat('\n')
                             cat(' t = ', t)
                           }
-                          p.val.vec[t] <- rslt$pval
+                          # rslt$`NTrans1->2`
+                          # rslt$`NTrans2->1`
+                          #p.val.array[t,s] <- rslt$pval
+                          p.val.vec[s] <- paste(rslt$`pval1->2`,rslt$`pval2->1`,sep = ',')
+                          if(message == T){cat(' s = ', s)}
                         }
                         if(message == T){
                           cat('\n')

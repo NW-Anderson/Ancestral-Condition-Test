@@ -88,7 +88,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         names(branch.means) <- branch.names
                         rm(branch.names)
                         # finding upper and lower quartiles
-                        upper <- summary(branch.means)[[4]]
+                        upper <- summary(branch.means)[[5]]
                         lower <- summary(branch.means)[[2]]
                         
                         # next we perform the following analysis on this tree for each of the scaling factors
@@ -107,7 +107,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
                           # count <- 0
-                          rate <- .06
+                          rate <- .1
                           #withTimeout({
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
@@ -136,8 +136,8 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                           message = F)# }, 
                           # timeout = 1200, onTimeout = "error")
                           # saving results in arrays
-                          rslt$`NTrans1->2`
-                          rslt$`NTrans2->1`
+                          # rslt$`NTrans1->2`
+                          # rslt$`NTrans2->1`
                           #p.val.array[t,s] <- rslt$pval
                           p.val.vec[s] <- paste(rslt$`pval1->2`,rslt$`pval2->1`,sep = ',')
                           if(message == T){cat(' s = ', s)}

@@ -29,7 +29,7 @@
 ## 2 with probabilities for each state
 # pi <- c(1,0)
 # drop.state <- 2
-AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", message = T) {
+AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
@@ -51,8 +51,6 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   ## ASR for discrete trait
   ## using stochastic mappings to nail down specific transition points
   ## if(!is.null(drop.state)){
-  ###### should i add a timeout????? #######
-  ###### change this to sim.char???  #######
   anc.state.dt <- make.simmap(trees, dt.vec,
                               model = matrix(mat, 2),
                               nsim = 1,
@@ -131,8 +129,12 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     smaller21 <- (sum(null.orig.val21 <= orig.val21) / mc)
     if (bigger21 <= smaller21){pval21 <- bigger21}
     if (smaller21 < bigger21){pval21 <- smaller21}
+    if (n.tails == 2){
+      pval12 <- 2 * pval12 
+      pval21 <- 2 * pval21
+    }
     ## print results to terminal
-    if(message == T){
+    if (message == T){
       cat(paste(
         "Mean value for the continuous trait at origin oftrait 2:",
         round(orig.val12, digits = 4),
@@ -206,6 +208,9 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     smaller <- (sum(null.orig.val <= orig.val) / mc)
     if (bigger <= smaller){pval <- bigger}
     if (smaller < bigger){pval <- smaller}
+    if (n.tails == 2){
+      pval <- 2 * pval
+    }
     ## print results to terminal
     if(message == T){cat(paste(
       "Mean value for the continuous trait at origin of derived trait:",

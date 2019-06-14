@@ -142,7 +142,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                                           message = F)# }, 
                           # timeout = 1200, onTimeout = "error")
                           # saving results in arrays
-                          #p.val.array[t,s] <- rslt$pval
+                          # p.val.array[t,s] <- rslt$pval
                           p.val.vec[s] <- rslt$pval
                           if(message == T){cat(' s = ', s)}
                         }
