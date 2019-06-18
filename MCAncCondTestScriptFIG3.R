@@ -112,8 +112,8 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                                                    par = matrix(c(-rate, 0, rate, 0), 2), 
                                                    model = 'discrete', 
                                                    root = 1)
-                            if(10 < sum(disc.trait == min(disc.trait)) && 
-                               sum(disc.trait == min(disc.trait)) < (n.taxa[s] - 10)){
+                            if(5 < sum(disc.trait == min(disc.trait)) && 
+                               sum(disc.trait == min(disc.trait)) < (n.taxa[s] - 5)){
                               good.sim <- T
                               # if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
                             }

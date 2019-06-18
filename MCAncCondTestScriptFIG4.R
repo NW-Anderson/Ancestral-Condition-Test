@@ -113,9 +113,9 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                             disc.trait <- sim.char(phy = alt.tree, 
                                                    par = matrix(c(-rate, rate, rate, -rate), 2), 
                                                    model = 'discrete', 
-                                                   root = 1)
-                            if((0.025 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
-                               sum(disc.trait == min(disc.trait)) < (.975 * n.taxa)){
+                                                   root = sample(c(1,2),1))
+                            if((0.05 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
+                               sum(disc.trait == min(disc.trait)) < (.95 * n.taxa)){
                               good.sim <- T
                               # if(message == T){cat(min(disc.trait), max(disc.trait), ' good sim ')}
                             }
