@@ -92,6 +92,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         lower <- summary(branch.means)[[2]]
                         
                         # next we perform the following analysis on this tree for each of the scaling factors
+                        
                         for(s in 1:10){
                           scale.factor <- s
                           # we leave the original trees un altered 
@@ -107,7 +108,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
                           # count <- 0
-                          rate <- .1
+                          rate <- .27
                           #withTimeout({
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
@@ -133,7 +134,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           #withTimeout({
                           rslt <- AncCond(trees = trees, 
                                           data = dat, 
-                                          message = F)# }, 
+                                          message = T)# }, 
                           # timeout = 1200, onTimeout = "error")
                           # saving results in arrays
                           # rslt$`NTrans1->2`
@@ -155,6 +156,6 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         # end <- Sys.time()
                       }
 fig4.data <- p.val.array
-save(fig4.data, file = 'AncCondFig4Data.RData')
+save(fig4.data, file = 'AncCondFig4DataPostBlackmon.RData')
 ##### END FIGURE 2 #####
 

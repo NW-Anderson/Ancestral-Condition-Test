@@ -122,17 +122,29 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     
     bigger12 <- (sum(null.orig.val12 >= orig.val12) / mc)
     smaller12 <- (sum(null.orig.val12 <= orig.val12) / mc)
-    if (bigger12 <= smaller12){pval12 <- bigger12}
-    if (smaller12 < bigger12){pval12 <- smaller12}
+    if(!is.null(producing.nodes12)){ 
+      if (bigger12 <= smaller12){pval12 <- bigger12}
+      if (smaller12 < bigger12){pval12 <- smaller12}
+      if (n.tails == 2){pval12 <- 2 * pval12}
+    }else{
+      pval12 <- NA
+    }
     
     bigger21 <- (sum(null.orig.val21 >= orig.val21) / mc)
     smaller21 <- (sum(null.orig.val21 <= orig.val21) / mc)
-    if (bigger21 <= smaller21){pval21 <- bigger21}
-    if (smaller21 < bigger21){pval21 <- smaller21}
-    if (n.tails == 2){
-      pval12 <- 2 * pval12 
-      pval21 <- 2 * pval21
+    if(!is.null(producing.nodes21)){ 
+      if (bigger21 <= smaller21){pval21 <- bigger21}
+      if (smaller21 < bigger21){pval21 <- smaller21}
+      if (n.tails == 2){pval21 <- 2 * pval21}
+    }else{
+      pval21 <- NA
     }
+    
+    
+    
+
+      
+    
     ## print results to terminal
     if (message == T){
       cat(paste(
@@ -156,8 +168,10 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       cat(paste("SD of null dist 1->2:", round(sd(null.orig.val12), digits = 4), "\n"))
       cat(paste("SD of null dist 2->1:", round(sd(null.orig.val21), digits = 4), "\n"))
       
-      cat(paste("pvalue 1->2:", round(pval12, digits = 4), "\n\n"))
+      cat(paste("pvalue 1->2:", round(pval12, digits = 4), "\n"))
       cat(paste("pvalue 2->1:", round(pval21, digits = 4), "\n\n"))
+      if(is.null(producing.nodes12)){cat('No 1 -> 2 transitions occured NA and NaN values produced.')}
+      if(is.null(producing.nodes21)){cat('No 2 -> 1 transitions occured NA and NaN values produced.')}
     }
     
     ## return results to user

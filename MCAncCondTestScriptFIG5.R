@@ -104,7 +104,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             # while loop is set up to make sure sufficient transitions occur on the tree
                             good.sim <- F
                             count <- 0
-                            rate <- .1
+                            rate <- .27
                             # withTimeout({
                             while(good.sim == F){
                               disc.trait <- sim.char(phy = alt.tree, 
@@ -146,7 +146,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           # rslt$`NTrans1->2`
                           # rslt$`NTrans2->1`
                           #p.val.array[t,s] <- rslt$pval
-                          p.val.vec[s] <- paste(rslt$`pval1->2`,rslt$`pval2->1`,sep = ',')
+                          p.val.vec[t] <- paste(rslt$`pval1->2`,rslt$`pval2->1`,sep = ',')
                           if(message == T){cat(' s = ', s)}
                         }
                         if(message == T){
@@ -157,7 +157,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                         # end <- sys.time
                       }
 fig5.data <- p.val.array
-save(fig5.data, file = 'AncCondFig5Data.RData')
+save(fig5.data, file = 'AncCondFig5DataPostBlackmon.RData')
 #######
 #}
 #HPRCAncCondFIG5()
