@@ -99,7 +99,7 @@ abline(h = .05, lty = 2, lwd = .7)
 
 ##### Fig 5 #####
 load('AncCondFig5DataPostBlackmon.RData')
-
+#### with rate = 3 there is still 14%NA values. Should I go higher??? ####
 x <- rep(seq(from=20, to=200, by=20), each=200)
 x <- jitter(x, factor=1.5)
 y <- vector()
@@ -113,6 +113,7 @@ for(i in 1:10){
   }
 }
 probs <- vector()
+probs2 <- vector()
 for(i in 1:10){
   probs[i] <- paste(
     as.character(
