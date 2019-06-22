@@ -104,7 +104,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             # while loop is set up to make sure sufficient transitions occur on the tree
                             good.sim <- F
                             count <- 0
-                            rate <- .27
+                            rate <- .3
                             # withTimeout({
                             while(good.sim == F){
                               disc.trait <- sim.char(phy = alt.tree, 
