@@ -144,7 +144,7 @@ pies[13:20,] <- rep.row(c(1,0,0),8)
 pies[21,] <- t(c(0,0,1))
 pies[22:23,] <- rep.row(c(0,1,0),2)
 pies[24:29,] <- rep.row(c(1,0,0),6)
-plot(trees, tip.color = 'transparent')
+plot(trees, tip.color = 'transparent', edge.width = 3)
 nodelabels(pie = pies, piecol = c('blue','red','green'),cex = .8)
 legend(x = 'bottomleft', legend = c('Ancestral','Derived','Producing (Ancestral)'),
        col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
