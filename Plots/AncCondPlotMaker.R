@@ -61,6 +61,9 @@ fig_label <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
   text(x1, y1, text, cex=cex, ...)
   return(invisible(c(x,y)))
 }
+rep.row<-function(x,n){
+  matrix(rep(x,each=n),nrow=n)
+}
 ##### Fig 1 #####
 par(mfrow = c(2,2))
 # trees <- trees(pars = c(3,1),
@@ -73,11 +76,41 @@ par(mfrow = c(2,2))
 # names(cont.trait) <- trees$tip.label
 load('Fig1Tree.RData')
 load('Fig1ContTrait.RData')
-smp <- contMap(trees,cont.trait, ftype = 'off', legend = F)
+
+smp <- contMap(trees,cont.trait, ftype = 'off', legend = .5, lims = c(.24,2))
 fig_label('A:',cex = 2.5)
 
+# cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
+# branch.means <- c()
+# branch.names <- c()
+# for(j in 1:nrow(trees$edge)){
+#   node.o.int <- trees$edge[j,1]
+#   if(node.o.int <= 30){
+#     one <- cont.trait[node.o.int]
+#   }else{
+#     one <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
+#   }
+#   node.o.int <- trees$edge[j,2]
+#   if(node.o.int <= 30){
+#     two <- cont.trait[node.o.int]
+#   }else{
+#     two <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
+#   }
+#   branch.means <- c(branch.means, mean(one, two))
+#   branch.names <- c(branch.names, paste(as.character(trees$edge[j,1]),as.character(trees$edge[j,2])))
+# }
+# names(branch.means) <- branch.names
+# rm(branch.names)
+# upper <- summary(branch.means)[[5]]
+# lower <- summary(branch.means)[[2]]
+# scale.factor <- 50
+# alt.tree <- trees
+# for(j in 1:length(branch.means)){
+#   if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
+#   if(branch.means[j] > upper){alt.tree$edge.length[j] <- alt.tree$edge.length[j] * scale.factor}
+# }
 # good.sim <- F
-# rate <- .1
+# rate <- .2
 # while(good.sim == F){
 #   disc.trait <- sim.char(phy = trees,
 #                          par = matrix(c(-rate, 0, rate, 0), 2),
@@ -94,12 +127,56 @@ fig_label('A:',cex = 2.5)
 #                             nsim = 1,
 #                             pi = c(1,0),
 #                             message = F)
+
 load('Fig1DiscSimMap.RData')
 plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
-legend(x = 'bottomleft', legend = c('Ancestral','Derived'), col = c('black', 'red'), pch = 15)
+legend(x = 'bottomleft', legend = c('Ancestral','Derived'), col = c('black', 'red'), pch = 15, bty = 'n')
 fig_label('B:',cex = 2.5)
 
+
+pies <- array(dim = c(anc.state.dt$Nnode, 3))
+pies[1:4,] <- rep.row(c(1,0,0),4)
+pies[5,] <- t(c(0,0,1))
+pies[6:7,] <- rep.row(c(0,1,0),2)
+pies[8:11,] <- rep.row(c(1,0,0),4)
+pies[12,] <- t(c(0,0,1))
+pies[13:20,] <- rep.row(c(1,0,0),8)
+pies[21,] <- t(c(0,0,1))
+pies[22:23,] <- rep.row(c(0,1,0),2)
+pies[24:29,] <- rep.row(c(1,0,0),6)
+plot(trees, tip.color = 'transparent')
+nodelabels(pie = pies, piecol = c('blue','red','green'),cex = .8)
+legend(x = 'bottomleft', legend = c('Ancestral','Derived','Producing (Ancestral)'),
+       col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
+fig_label('C:',cex = 2.5)
+
+ss_nodes <- anc.state.dt$mapped.edge[, 1] > 0 &
+  anc.state.dt$mapped.edge[, 2] > 0
+wanted_branches <- ss_nodes[ss_nodes == T]
+wanted_nodes <- names(wanted_branches)
+wanted_nodes <- gsub(",.*", "", wanted_nodes)
+producing.nodes <- unique(wanted_nodes)
+anc.states <- anc.ML(trees, cont.trait, model = "BM")
+orig.val <- mean(anc.states$ace[names(anc.states$ace) %in% producing.nodes])
+null.orig.val <- vector(length = 1000)
+number.of.trans <- length(producing.nodes)
+anc.dt <- anc.state.dt
+anc.ct <- anc.states
+node.states <- describe.simmap(anc.dt)$states
+anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)[node.states != '2']]
+for (j in 1:1000){
+  # set.seed(j)
+  null.orig.val[j] <- mean(sample(anc.cond.nodes,
+                                  length(producing.nodes)))
+}
+par(mar = c(4,4,0,0) + .1)
+plot(density(null.orig.val), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
+abline(v = orig.val, col = 'red')
+legend(x = 'topright', legend = c('Producing','All'), col = c('red', 'black'), pch = 15, bty = 'n')
+fig_label('D:',cex = 2.5)
+
 ##### Fig 2 #####
+par(mfrow = c(1,1), mar = c(5,4,4,2) + .1)
 load('AncCondFig2DataPostBlackmon.RData')
 # data <- cbind(rep(1:10, each = 100), 
 #               as.vector(fig2.data))
@@ -125,13 +202,6 @@ mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
 abline(h = .05, lty = 2, lwd = .7)
-
-# sigres <- c()
-# for(i in 1:10){
-#   sigres[i] <- sum(fig2.data[,i] < .05)
-# }
-# sigres
-
 
 ##### Origins Figure ##### ????????
 
