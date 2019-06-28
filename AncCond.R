@@ -69,7 +69,6 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   wanted_branches <- ss_nodes[ss_nodes == T]
   wanted_nodes <- names(wanted_branches)
   
-  ##### HOW TO DO THIS #####
   if(sum(mat == c(0,2,1,0)) == 4){
     # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
     producing.nodes12 <- c()
@@ -103,19 +102,16 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     anc.dt <- anc.state.dt
     anc.ct <- anc.states.cont.trait
     node.states <- describe.simmap(anc.dt)$states
-    if(!is.null(drop.state)){
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in%
-                                     names(node.states)[node.states != drop.state]]
-    }
-    if(is.null(drop.state)){
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)]
-    }
+    anc.cond.nodes12 <- anc.ct$ace[names(anc.ct$ace) %in%
+                                     names(node.states)[node.states != '2']]
+    anc.cond.nodes21 <- anc.ct$ace[names(anc.ct$ace) %in%
+                                     names(node.states)[node.states != '1']]
     
     for (j in 1:mc){
       # set.seed(j)
-      null.orig.val12[j] <- mean(sample(anc.cond.nodes,
+      null.orig.val12[j] <- mean(sample(anc.cond.nodes12,
                                         length(producing.nodes12)))
-      null.orig.val21[j] <- mean(sample(anc.cond.nodes,
+      null.orig.val21[j] <- mean(sample(anc.cond.nodes21,
                                         length(producing.nodes21)))
     }
     ## how many more extreme
@@ -139,11 +135,6 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     }else{
       pval21 <- NA
     }
-    
-    
-    
-
-      
     
     ## print results to terminal
     if (message == T){
@@ -203,13 +194,8 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     anc.dt <- anc.state.dt
     anc.ct <- anc.states.cont.trait
     node.states <- describe.simmap(anc.dt)$states
-    if(!is.null(drop.state)){
       anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in%
-                                     names(node.states)[node.states != drop.state]]
-    }
-    if(is.null(drop.state)){
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)]
-    }
+                                     names(node.states)[node.states != '2']]
     
     for (j in 1:mc){
       # set.seed(j)

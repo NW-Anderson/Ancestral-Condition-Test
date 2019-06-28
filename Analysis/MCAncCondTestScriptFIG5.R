@@ -103,7 +103,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             # next we simulated a discrete trait on this altered tree
                             # while loop is set up to make sure sufficient transitions occur on the tree
                             good.sim <- F
-                            count <- 0
+                            # count <- 0
                             rate <- .3
                             # withTimeout({
                             while(good.sim == F){
