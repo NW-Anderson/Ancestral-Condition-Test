@@ -77,7 +77,13 @@ par(mfrow = c(2,2))
 load('Fig1Tree.RData')
 load('Fig1ContTrait.RData')
 
-smp <- contMap(trees,cont.trait, ftype = 'off', legend = .5, lims = c(.24,2))
+smp <- contMap(trees,cont.trait, ftype = 'off', legend = F, lims = c(.24,2), plot = F)
+n<-length(smp$cols)
+## change to grey scale
+smp$cols[1:n]<-rainbow(n, end = 4/6)
+plot(smp, legend = F,ftype = 'off')
+gradientLegend(valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
+legend(x = 'bottomleft', legend = '', title = 'Cont Trait Value', bg="transparent", bty = 'n')
 fig_label('A:',cex = 2.5)
 
 # cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
@@ -170,7 +176,7 @@ for (j in 1:1000){
                                   length(producing.nodes)))
 }
 par(mar = c(4,4,0,0) + .1)
-plot(density(null.orig.val), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
+plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
 abline(v = orig.val, col = 'red')
 legend(x = 'topright', legend = c('Producing','All'), col = c('red', 'black'), pch = 15, bty = 'n')
 fig_label('D:',cex = 2.5)
