@@ -197,7 +197,7 @@ probs <- vector()
 for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig2.data[1:100, i] <= .05)),'%')
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.7)
+plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6)
 mtext(probs, side=3, at=1:10, cex=.7)
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
@@ -224,7 +224,7 @@ for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig3.data[1:100, i] <= .05)),'%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.7, xlim=c(10, 210))
+     pch=16,cex=.6, xlim=c(10, 210))
 mtext(probs, 
       side=3, at=seq(from=20, to=200, by=20), cex=.7)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
