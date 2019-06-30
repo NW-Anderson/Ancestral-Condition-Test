@@ -64,6 +64,7 @@ fig_label <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
 rep.row<-function(x,n){
   matrix(rep(x,each=n),nrow=n)
 }
+library(plotfunctions)
 ##### Fig 1 #####
 par(mfrow = c(2,2))
 # trees <- trees(pars = c(3,1),
@@ -74,8 +75,8 @@ par(mfrow = c(2,2))
 # trees$edge.length <- trees$edge.length / max(branching.times(trees))
 # cont.trait <- sim.char(trees, 0.2, model = 'BM')
 # names(cont.trait) <- trees$tip.label
-load('Fig1Tree.RData')
-load('Fig1ContTrait.RData')
+load('Data/Fig1Tree.RData')
+load('Data/Fig1ContTrait.RData')
 
 smp <- contMap(trees,cont.trait, ftype = 'off', legend = F, lims = c(.24,2), plot = F)
 n<-length(smp$cols)
@@ -134,7 +135,7 @@ fig_label('A:',cex = 2.5)
 #                             pi = c(1,0),
 #                             message = F)
 
-load('Fig1DiscSimMap.RData')
+load('Data/Fig1DiscSimMap.RData')
 plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
 legend(x = 'bottomleft', legend = c('Ancestral','Derived'), col = c('black', 'red'), pch = 15, bty = 'n')
 fig_label('B:',cex = 2.5)
@@ -150,7 +151,8 @@ pies[13:20,] <- rep.row(c(1,0,0),8)
 pies[21,] <- t(c(0,0,1))
 pies[22:23,] <- rep.row(c(0,1,0),2)
 pies[24:29,] <- rep.row(c(1,0,0),6)
-plot(trees, tip.color = 'transparent', edge.width = 3)
+# plot(trees, tip.color = 'transparent', edge.width = 3)
+plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
 nodelabels(pie = pies, piecol = c('blue','red','green'),cex = .8)
 legend(x = 'bottomleft', legend = c('Ancestral','Derived','Producing (Ancestral)'),
        col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
@@ -183,7 +185,7 @@ fig_label('D:',cex = 2.5)
 
 ##### Fig 2 #####
 par(mfrow = c(1,1), mar = c(5,4,4,2) + .1)
-load('AncCondFig2DataPostBlackmon.RData')
+load('Data/AncCondFig2DataPostBlackmon.RData')
 
 
 
@@ -207,7 +209,7 @@ abline(h = .05, lty = 2, lwd = .7)
 ##### Origins Figure ##### ????????
 
 ##### Fig 3 #####
-load('AncCondFig3DataPostBlackmon.RData')
+load('Data/AncCondFig3DataPostBlackmon.RData')
 # data <- cbind(rep(1:10, each = 100), 
 #               as.vector(fig2.data))
 # colnames(data) <- c('Scale.Factor','Pval')
@@ -235,7 +237,7 @@ abline(h = .05, lty = 2, lwd = .7)
 
 
 ##### Fig 4 #####
-load('AncCondFig4DataPostBlackmonp3.RData')
+load('Data/AncCondFig4DataPostBlackmonp3.RData')
 
 x <- rep(1:10, each=200)
 x <- jitter(x, factor=1.5)
@@ -270,7 +272,7 @@ abline(h = .025, lty = 2, lwd = .7)
 
 
 ##### Fig 5 #####
-load('AncCondFig5DataPostBlackmonp3.RData')
+load('Data/AncCondFig5DataPostBlackmonp3.RData')
 # with rate = 3 there is still 14%NA values. Should I go higher??? #
 x <- rep(seq(from=20, to=200, by=20), each=200)
 x <- jitter(x, factor=1.5)

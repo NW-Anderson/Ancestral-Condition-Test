@@ -36,13 +36,15 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   
   ## create named vector for cont trait taxa not in derived state
   if(!is.null(drop.state)){
-    ct.data <- data[data[, 3] != drop.state,]
+    ct.data <- data[(data[, 3] != drop.state),]
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
+    ct.vec <- ct.vec[!is.na(ct.vec)]
   }else{
     ct.data <- data
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
+    ct.vec <- ct.vec[!is.na(ct.vec)]
   }
   
   ## ASR for the continuous trait
@@ -194,8 +196,8 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     anc.dt <- anc.state.dt
     anc.ct <- anc.states.cont.trait
     node.states <- describe.simmap(anc.dt)$states
-      anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in%
-                                     names(node.states)[node.states != '2']]
+    anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in%
+                                   names(node.states)[node.states != '2']]
     
     for (j in 1:mc){
       # set.seed(j)
