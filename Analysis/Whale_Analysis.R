@@ -1,13 +1,14 @@
-tree <- read.tree(file = 'Data/whales.tre')
-sizes <- read.csv('Data/whale_sizes.csv')
-source('AncCond.R')
-
 library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
 library(doSNOW)
 library(foreach)
+
+tree <- read.tree(file = 'Data/whales.tre')
+sizes <- read.csv('Data/whale_sizes.csv')
+source('AncCond.R')
+
 cl<-makeCluster(3, type="SOCK")
 on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
@@ -99,6 +100,7 @@ for(j in 1:length(branch.means)){
   if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
   if(branch.means[j] > upper){alt.tree$edge.length[j] <- alt.tree$edge.length[j] * scale.factor}
 }
+#####
 sig.vector <- foreach(i = 1:100, .options.multicore=opts, .combine = 'c', 
                       .packages=c("phytools","diversitree","geiger")) %dopar% {
                         good.sim <- F
