@@ -65,6 +65,12 @@ rep.row<-function(x,n){
   matrix(rep(x,each=n),nrow=n)
 }
 library(plotfunctions)
+library(R.utils)
+library(phytools)
+library(diversitree)
+library(geiger)
+library(doSNOW)
+library(foreach)
 ##### Fig 1 #####
 par(mfrow = c(2,2))
 # trees <- trees(pars = c(3,1),
@@ -153,8 +159,8 @@ pies[22:23,] <- rep.row(c(0,1,0),2)
 pies[24:29,] <- rep.row(c(1,0,0),6)
 # plot(trees, tip.color = 'transparent', edge.width = 3)
 plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
-nodelabels(pie = pies, piecol = c('blue','red','green'),cex = .8)
-legend(x = 'bottomleft', legend = c('Ancestral','Derived','Producing (Ancestral)'),
+nodelabels(pie = pies, piecol = c('blue','green', 'red'),cex = .8)
+legend(x = 'bottomleft', legend = c('Ancestral','Producing (Ancestral)','Derived'),
        col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
 fig_label('C:',cex = 2.5)
 
@@ -185,7 +191,7 @@ fig_label('D:',cex = 2.5)
 
 ##### Fig 2 #####
 par(mfrow = c(1,1), mar = c(5,4,4,2) + .1)
-load('Data/AncCondFig2DataPostBlackmon.RData')
+load('Data/Fig2Data.RData')
 
 
 
@@ -199,7 +205,7 @@ probs <- vector()
 for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig2.data[1:100, i] <= .05)),'%')
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6)
+plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6, main = 'Unidirectional Evolution', adj = 0)
 mtext(probs, side=3, at=1:10, cex=.7)
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
@@ -209,7 +215,7 @@ abline(h = .05, lty = 2, lwd = .7)
 ##### Origins Figure ##### ????????
 
 ##### Fig 3 #####
-load('Data/AncCondFig3DataPostBlackmon.RData')
+load('Data/Fig3Data.RData')
 # data <- cbind(rep(1:10, each = 100), 
 #               as.vector(fig2.data))
 # colnames(data) <- c('Scale.Factor','Pval')
@@ -226,7 +232,7 @@ for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig3.data[1:100, i] <= .05)),'%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.6, xlim=c(10, 210))
+     pch=16,cex=.6, xlim=c(10, 210), main = 'Unidirectional Evolution', adj = 0)
 mtext(probs, 
       side=3, at=seq(from=20, to=200, by=20), cex=.7)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
@@ -237,7 +243,7 @@ abline(h = .05, lty = 2, lwd = .7)
 
 
 ##### Fig 4 #####
-load('Data/AncCondFig4DataPostBlackmonp3.RData')
+load('Data/Fig4Data.RData')
 
 x <- rep(1:10, each=200)
 x <- jitter(x, factor=1.5)
@@ -261,7 +267,7 @@ for(i in 1:10){
       round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .05, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
             digits = 0)),'%')
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6)
+plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6, main = 'Bidirectional Evolution', adj = 0)
 mtext(probs, side=3, at=1:10, cex=.7)
 # mtext(probs2, side = 3, at = 1:10, cex = .7, line = .6, col = 'red')
 mtext(1:10, side=1, at=1:10, cex=.85)
@@ -272,7 +278,7 @@ abline(h = .025, lty = 2, lwd = .7)
 
 
 ##### Fig 5 #####
-load('Data/AncCondFig5DataPostBlackmonp3.RData')
+load('Data/Fig5Data.RData')
 # with rate = 3 there is still 14%NA values. Should I go higher??? #
 x <- rep(seq(from=20, to=200, by=20), each=200)
 x <- jitter(x, factor=1.5)
@@ -299,7 +305,7 @@ for(i in 1:10){
             digits = 0)),'%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.6, xlim=c(10, 210))
+     pch=16,cex=.6, xlim=c(10, 210),main = 'Bidirectional Evolution', adj = 0)
 mtext(probs, 
       side=3, at=seq(from=20, to=200, by=20), cex=.7)
 # mtext(probs2, 
@@ -310,3 +316,4 @@ mtext("Taxa", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
 abline(h = .025, lty = 2, lwd = .7)
 # abline(h = .05, lty = 2, lwd = .7)
+

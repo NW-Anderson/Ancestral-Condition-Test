@@ -19,7 +19,7 @@ registerDoSNOW(cl)
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE) #### Move inside for HPRC
+source('AncCondMultiSimmap.R', local = TRUE) #### Move inside for HPRC
 
 ##### Making fig2 ######
 # we do the following for each of 200 trees
@@ -159,7 +159,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         # end <- Sys.time()
                       }
 fig2.data <- p.val.array
-save(fig2.data, file = 'AncCondFig2DataPostBlackmon.RData')
+save(fig2.data, file = 'Data/AncCondFig2DataMultiSimmap.RData')
 ##### END FIGURE 2 #####
 # }
 
