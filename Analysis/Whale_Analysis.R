@@ -34,8 +34,8 @@ sig.vector <- foreach(i = 1:100, .options.multicore=opts, .combine = 'c',
                                                  par = matrix(c(-rate, 0, rate, 0), 2),
                                                  model = 'discrete',
                                                  root = 1)
-                          if(5 < sum(disc.trait == min(disc.trait)) && 
-                             sum(disc.trait == min(disc.trait)) < (length(tree$tip.label) - 5)){
+                          if(10 < sum(disc.trait == min(disc.trait)) && 
+                             sum(disc.trait == min(disc.trait)) < (length(tree$tip.label) - 10)){
                             good.sim <- T
                           }
                         }
