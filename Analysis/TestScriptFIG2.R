@@ -159,7 +159,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         # end <- Sys.time()
                       }
 fig2.data <- p.val.array
-save(fig2.data, file = 'Data/AncCondFig2DataMultiSimmaptry2.RData')
+save(fig2.data, file = 'Data/AncCondFig2DataMultiSimmapNoNullMean.RData')
 ##### END FIGURE 2 #####
 # }
 
