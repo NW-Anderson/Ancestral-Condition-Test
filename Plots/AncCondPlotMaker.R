@@ -216,6 +216,7 @@ abline(h = .05, lty = 2, lwd = .7)
 
 ##### Fig 3 #####
 load('Data/Fig3Data.RData')
+load('UniNtaxaData.RData')
 # data <- cbind(rep(1:10, each = 100), 
 #               as.vector(fig2.data))
 # colnames(data) <- c('Scale.Factor','Pval')
@@ -231,10 +232,24 @@ probs <- vector()
 for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig3.data[1:100, i] <= .05)),'%')
 }
+probsfp <- vector()
+for(i in 1:10){
+  probsfp[i] <- paste(as.character(sum(fig3pt5.data[1:100, i] <= .05)), '%')
+}
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.6, xlim=c(10, 210), main = 'Unidirectional Evolution', adj = 0)
+     pch=16,cex=.5, xlim=c(10, 210), main = 'Unidirectional Evolution', adj = 0)
+
+x <- rep(seq(from=20, to=200, by=20), each=100)
+x <- jitter(x, factor=1.5)
+y <- vector()
+for(i in 1:10){
+  y <- c(y, fig3pt5.data[1:100, i])
+}
+points(x = x, y = y, col = 'red', pch = 16, cex = .5)
 mtext(probs, 
       side=3, at=seq(from=20, to=200, by=20), cex=.7)
+mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
+      cex = .7, col = 'red', line = .6)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
       at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
 mtext("Taxa", side=1, line=1)
@@ -279,6 +294,7 @@ abline(h = .025, lty = 2, lwd = .7)
 
 ##### Fig 5 #####
 load('Data/Fig5Data.RData')
+load('MC_BiNtaxa_fp.RData')
 # with rate = 3 there is still 14%NA values. Should I go higher??? #
 x <- rep(seq(from=20, to=200, by=20), each=200)
 x <- jitter(x, factor=1.5)
@@ -305,9 +321,33 @@ for(i in 1:10){
             digits = 0)),'%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.6, xlim=c(10, 210),main = 'Bidirectional Evolution', adj = 0)
+     pch=16,cex=.5, xlim=c(10, 210),main = 'Bidirectional Evolution', adj = 0)
+
+x <- rep(seq(from=20, to=200, by=20), each=200)
+x <- jitter(x, factor=1.5)
+y <- vector()
+for(i in 1:10){
+  for(j in 1:10){
+    for(i in 1:100){
+      y[2 * (100 * (j - 1) + i - 1) + 1] <- as.numeric(gsub(",.*", "",fig5pt5.data[i,j]))
+      y[2 * (100 * (j - 1) + i - 1) + 2] <- as.numeric(substr(fig5pt5.data[i,j], (nchar(gsub(",.*", "",fig5pt5.data[i,j])) + 2), 
+                                                              nchar(fig5pt5.data[i,j])))
+    }
+  }
+}
+probsfp <- vector()
+for(i in 1:10){
+  probsfp[i] <- paste(
+    as.character(
+      round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
+            digits = 0)),'%')
+
+}
+points(x = x, y = y, col = 'red', pch = 16, cex = .5)
 mtext(probs, 
       side=3, at=seq(from=20, to=200, by=20), cex=.7)
+mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
+      cex = .7, col = 'red', line = .6)
 # mtext(probs2, 
 #       side = 3, at=seq(from=20, to=200, by=20), cex = .7, line = .6)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 

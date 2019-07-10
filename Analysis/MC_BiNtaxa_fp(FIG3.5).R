@@ -150,8 +150,8 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                         p.val.vec
                         # end <- sys.time
                       }
-fig5.data <- p.val.array
-save(fig5.data, file = 'MC_BiNtaxa_fp.RData')
+fig5pt5.data <- p.val.array
+save(fig5pt5.data, file = 'MC_BiNtaxa_fp.RData')
 #######
 #}
 #HPRCAncCondFIG5()

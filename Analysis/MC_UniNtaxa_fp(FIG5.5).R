@@ -151,4 +151,4 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                         # end <- sys.time
                       }
 fig3pt5.data <- p.val.array
-save(fig3.data, file = 'UniNtaxaData.RData')
+save(fig3.data, file = 'UniNtaxaDataTry2.RData')
