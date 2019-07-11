@@ -89,7 +89,7 @@ n<-length(smp$cols)
 ## change to grey scale
 smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
-gradientLegend(valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
+gradientLegend(depth = .04, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
 legend(x = 'bottomleft', legend = '', title = '        Cont Trait Value', bg="transparent", bty = 'n')
 fig_label('A:',cex = 2.5)
 
