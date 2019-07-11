@@ -90,7 +90,7 @@ n<-length(smp$cols)
 smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
 gradientLegend(valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
-legend(x = 'bottomleft', legend = '', title = 'Cont Trait Value', bg="transparent", bty = 'n')
+legend(x = 'bottomleft', legend = '', title = '        Cont Trait Value', bg="transparent", bty = 'n')
 fig_label('A:',cex = 2.5)
 
 # cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
@@ -205,8 +205,20 @@ probs <- vector()
 for(i in 1:10){
   probs[i] <- paste(as.character(sum(fig2.data[1:100, i] <= .05)),'%')
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6, main = 'Unidirectional Evolution', adj = 0)
-mtext(probs, side=3, at=1:10, cex=.7)
+plot(x = x, y = y, xaxt="n",xlab="", ylab= "",
+     pch=16,cex=.49, 
+     main = 'Unidirectional Evolution', 
+     adj = 0, ylim = c(0,.57))
+points(x = x[1:100], y = y[1:100], pch = 16,
+       cex = .49, col = 'red')
+points(x = x[101:1000], y = y[101:1000], pch = 16,
+       cex = .49, col = 'blue')
+legend(x = 'topright', 
+       legend = c('False Positive (No Correlation)',
+                  'Power (Correlation)'), 
+       col = c('red', 'blue'), pch = 16, bty = 'n')
+mtext(probs[1], side=3, at=1, cex=.7, col = 'red')
+mtext(probs[2:10], side=3, at=2:10, cex=.7, col = 'blue')
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
@@ -215,8 +227,10 @@ abline(h = .05, lty = 2, lwd = .7)
 ##### Origins Figure ##### ????????
 
 ##### Fig 3 #####
+load('UniNtaxaDataTry2.RData')
+fig3pt5.data <- fig3.data
 load('Data/Fig3Data.RData')
-load('UniNtaxaData.RData')
+
 # data <- cbind(rep(1:10, each = 100), 
 #               as.vector(fig2.data))
 # colnames(data) <- c('Scale.Factor','Pval')
@@ -237,7 +251,9 @@ for(i in 1:10){
   probsfp[i] <- paste(as.character(sum(fig3pt5.data[1:100, i] <= .05)), '%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.5, xlim=c(10, 210), main = 'Unidirectional Evolution', adj = 0)
+     pch=16,cex=.49, xlim=c(10, 210), 
+     main = 'Unidirectional Evolution', adj = 0,
+     col = 'blue', ylim = c(0,.57))
 
 x <- rep(seq(from=20, to=200, by=20), each=100)
 x <- jitter(x, factor=1.5)
@@ -245,9 +261,10 @@ y <- vector()
 for(i in 1:10){
   y <- c(y, fig3pt5.data[1:100, i])
 }
-points(x = x, y = y, col = 'red', pch = 16, cex = .5)
+points(x = x, y = y, col = 'red', pch = 16, cex = .49)
 mtext(probs, 
-      side=3, at=seq(from=20, to=200, by=20), cex=.7)
+      side=3, at=seq(from=20, to=200, by=20), 
+      cex=.7, col = 'blue')
 mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
       cex = .7, col = 'red', line = .6)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
@@ -255,7 +272,10 @@ mtext(c(20,40,60,80,100,120,140,160,180,200), side=1,
 mtext("Taxa", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
 abline(h = .05, lty = 2, lwd = .7)
-
+legend(x = 'topright', 
+       legend = c('False Positive (No Correlation)',
+                  'Power (Correlation)'), 
+       col = c('red', 'blue'), pch = 16, bty = 'n')
 
 ##### Fig 4 #####
 load('Data/Fig4Data.RData')
@@ -282,15 +302,26 @@ for(i in 1:10){
       round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .05, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
             digits = 0)),'%')
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "", pch=16,cex=.6, main = 'Bidirectional Evolution', adj = 0)
-mtext(probs, side=3, at=1:10, cex=.7)
+plot(x = x, y = y, xaxt="n",xlab="",
+     ylab= "", pch=16,cex=.49, 
+     main = 'Bidirectional Evolution', adj = 0,
+     ylim = c(0,.57))
+points(x = x[1:200], y = y[1:200], pch = 16,
+       cex = .49, col = 'red')
+points(x = x[201:2000], y = y[201:2000], pch = 16,
+       cex = .49, col = 'blue')
+mtext(probs[1], side=3, at=1, cex=.7, col = 'red')
+mtext(probs[2:10], side=3, at=2:10, cex=.7, col = 'blue')
 # mtext(probs2, side = 3, at = 1:10, cex = .7, line = .6, col = 'red')
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
 abline(h = .025, lty = 2, lwd = .7)
 # abline(h = .05, lty = 2, lwd = .7)
-
+legend(x = 'topright', 
+       legend = c('False Positive (No Correlation)',
+                  'Power (Correlation)'), 
+       col = c('red', 'blue'), pch = 16, bty = 'n')
 
 ##### Fig 5 #####
 load('Data/Fig5Data.RData')
@@ -321,7 +352,9 @@ for(i in 1:10){
             digits = 0)),'%')
 }
 plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.5, xlim=c(10, 210),main = 'Bidirectional Evolution', adj = 0)
+     pch=16,cex=.49, xlim=c(10, 210),
+     main = 'Bidirectional Evolution', adj = 0,
+     ylim = c(0,.57), col = 'blue')
 
 x <- rep(seq(from=20, to=200, by=20), each=200)
 x <- jitter(x, factor=1.5)
@@ -343,9 +376,10 @@ for(i in 1:10){
             digits = 0)),'%')
 
 }
-points(x = x, y = y, col = 'red', pch = 16, cex = .5)
+points(x = x, y = y, col = 'red', pch = 16, cex = .49)
 mtext(probs, 
-      side=3, at=seq(from=20, to=200, by=20), cex=.7)
+      side=3, at=seq(from=20, to=200, by=20), 
+      cex=.7, col ='blue')
 mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
       cex = .7, col = 'red', line = .6)
 # mtext(probs2, 
@@ -356,4 +390,8 @@ mtext("Taxa", side=1, line=1)
 mtext("p-value", side=2, line=2.2)
 abline(h = .025, lty = 2, lwd = .7)
 # abline(h = .05, lty = 2, lwd = .7)
+legend(x = 'topright', 
+       legend = c('False Positive (No Correlation)',
+                  'Power (Correlation)'), 
+       col = c('red', 'blue'), pch = 16, bty = 'n')
 
