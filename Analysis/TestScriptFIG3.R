@@ -26,7 +26,7 @@ source('AncCond.R', local = TRUE)
 ##### Making fig3 ######
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes
-# p.val.array <- array(dim = c(n.trees, 10))
+p.val.array <- array(dim = c(n.trees, 10))
 
 # this time we vary the size of the tree
 

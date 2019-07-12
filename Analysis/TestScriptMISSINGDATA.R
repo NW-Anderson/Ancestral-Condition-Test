@@ -27,9 +27,7 @@ source('AncCond.R', local = TRUE)
 ##### Making fig3 ######
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes
-# p.val.array <- array(dim = c(n.trees, 10))
-
-# this time we vary the size of the tree
+p.val.array <- array(dim = c(n.trees, 10))
 
 p.val.array <-foreach(s = 1:length(miss), .options.multicore=opts, .combine = 'cbind', 
                       .packages=c("phytools","diversitree","geiger")) %dopar%{
@@ -166,7 +164,7 @@ p.val.array <-foreach(s = 1:length(miss), .options.multicore=opts, .combine = 'c
                         # end <- sys.time
                       }
 data <- p.val.array
-save(fig3.data, file = 'UniPowerMisingData.RData')
+save(data, file = 'UniPowerMisingData.RData')
 #######
 # }
 # HPRCAncCondFIG3()
