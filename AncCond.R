@@ -29,6 +29,7 @@
 ## 2 with probabilities for each state
 ## n.tails either 1 or 2 depending on whether user has apriori hypothesis about a certain state
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
+  trees$edge.length <- trees$edge.length / max(branching.times(trees))
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
@@ -38,14 +39,15 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     ct.data <- data[(data[, 3] != drop.state),]
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
-    ct.vec <- ct.vec[!is.na(ct.vec)]
   }else{
     ct.data <- data
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
-    ct.vec <- ct.vec[!is.na(ct.vec)]
   }
-  
+  if(sum(is.na(ct.vec)) > 0 | sum(is.na(dt.vec)) > 0){
+    stop('There exists missing trait data for some species in the phylogeny.\n
+         Please remove such taxa from the tree.')
+  }
   ## ASR for the continuous trait
   anc.states.cont.trait <- anc.ML(trees, ct.vec, model = "BM")
   
