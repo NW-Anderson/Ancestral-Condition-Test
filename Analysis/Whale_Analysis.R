@@ -26,7 +26,7 @@ for(i in 1:length(sizes$Australophocaena.dioptrica)){
 }
 reordered.sizes <- reordered.sizes[!is.na(reordered.sizes)]
 tree <- keep.tip(tree, names(reordered.sizes))
-sig.vector <- foreach(i = 1:100, .options.multicore=opts, .combine = 'c', 
+sig.vector <- foreach(i = 1:300, .options.multicore=opts, .combine = 'c', 
                       .packages=c("phytools","diversitree","geiger")) %dopar% {
                         good.sim <- F
                         rate <- .1
@@ -50,4 +50,4 @@ sig.vector <- foreach(i = 1:100, .options.multicore=opts, .combine = 'c',
                                         message = T)
                         rslt$pval < .05
                       }
-paste('With no relation the AncCond reportedsignificant correlation ', sum(sig.vector), '% of the time.')
+paste('With no relation the AncCond reported significant correlation ', sum(sig.vector)/2, '% of the time.')
