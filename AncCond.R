@@ -25,10 +25,9 @@
 
 ## mat transition matrix for make.simmap
 
-## pi same values possible as make.simmap: "equal", "estimated" vector length
+## pi same values possible as make.simmap: "equal", "estimated", or vector length
 ## 2 with probabilities for each state
-# pi <- c(1,0)
-# drop.state <- 2
+## n.tails either 1 or 2 depending on whether user has apriori hypothesis about a certain state
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
@@ -71,7 +70,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   wanted_branches <- ss_nodes[ss_nodes == T]
   wanted_nodes <- names(wanted_branches)
   
-  if(sum(mat == c(0,2,1,0)) == 4){
+  if(sum(mat) > 1){
     # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
     producing.nodes12 <- c()
     producing.nodes21 <-c()
