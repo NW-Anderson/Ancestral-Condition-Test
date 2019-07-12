@@ -89,8 +89,8 @@ n<-length(smp$cols)
 ## change to grey scale
 smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
-gradientLegend(depth = .04, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
-legend(x = 'bottomleft', legend = '', title = '        Cont Trait Value', bg="transparent", bty = 'n')
+gradientLegend(depth = .03, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
+legend(x = 'bottomleft', legend = '', title = '         Cont Trait Value', bg="transparent", bty = 'n')
 fig_label('A:',cex = 2.5)
 
 # cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
@@ -237,7 +237,7 @@ load('Data/Fig3Data.RData')
 
 
 x <- rep(seq(from=20, to=200, by=20), each=100)
-x <- jitter(x, factor=1.5)
+x <- jitter(x, factor=.9)
 y <- vector()
 for(i in 1:10){
   y <- c(y, fig3.data[1:100, i])
@@ -250,23 +250,23 @@ probsfp <- vector()
 for(i in 1:10){
   probsfp[i] <- paste(as.character(sum(fig3pt5.data[1:100, i] <= .05)), '%')
 }
-plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
+plot(x = (x+3), y = y, xlab="", ylab= "", xaxt="n", 
      pch=16,cex=.49, xlim=c(10, 210), 
      main = 'Unidirectional Evolution', adj = 0,
      col = 'blue', ylim = c(0,.57))
 
 x <- rep(seq(from=20, to=200, by=20), each=100)
-x <- jitter(x, factor=1.5)
+x <- jitter(x, factor=.9)
 y <- vector()
 for(i in 1:10){
   y <- c(y, fig3pt5.data[1:100, i])
 }
-points(x = x, y = y, col = 'red', pch = 16, cex = .49)
+points(x = (x-3), y = y, col = 'red', pch = 16, cex = .49)
 mtext(probs, 
-      side=3, at=seq(from=20, to=200, by=20), 
+      side=3, at=seq(from=23, to=203, by=20), 
       cex=.7, col = 'blue')
-mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
-      cex = .7, col = 'red', line = .6)
+mtext(probsfp, side = 3, at=seq(from=17, to=197, by=20), 
+      cex = .7, col = 'red')
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
       at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
 mtext("Taxa", side=1, line=1)
@@ -328,7 +328,7 @@ load('Data/Fig5Data.RData')
 load('MC_BiNtaxa_fp.RData')
 # with rate = 3 there is still 14%NA values. Should I go higher??? #
 x <- rep(seq(from=20, to=200, by=20), each=200)
-x <- jitter(x, factor=1.5)
+x <- jitter(x, factor=.9)
 y <- vector()
 for(i in 1:10){
   for(j in 1:10){
@@ -351,13 +351,13 @@ for(i in 1:10){
       round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .05, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
             digits = 0)),'%')
 }
-plot(x = x, y = y, xlab="", ylab= "", xaxt="n", 
+plot(x = (x+3), y = y, xlab="", ylab= "", xaxt="n", 
      pch=16,cex=.49, xlim=c(10, 210),
      main = 'Bidirectional Evolution', adj = 0,
      ylim = c(0,.57), col = 'blue')
 
 x <- rep(seq(from=20, to=200, by=20), each=200)
-x <- jitter(x, factor=1.5)
+x <- jitter(x, factor=.9)
 y <- vector()
 for(i in 1:10){
   for(j in 1:10){
@@ -376,12 +376,12 @@ for(i in 1:10){
             digits = 0)),'%')
 
 }
-points(x = x, y = y, col = 'red', pch = 16, cex = .49)
+points(x = (x-3), y = y, col = 'red', pch = 16, cex = .49)
 mtext(probs, 
-      side=3, at=seq(from=20, to=200, by=20), 
-      cex=.7, col ='blue')
-mtext(probsfp, side = 3, at=seq(from=20, to=200, by=20), 
-      cex = .7, col = 'red', line = .6)
+      side=3, at=seq(from=23, to=203, by=20), 
+      cex=.7, col = 'blue')
+mtext(probsfp, side = 3, at=seq(from=17, to=197, by=20), 
+      cex = .7, col = 'red')
 # mtext(probs2, 
 #       side = 3, at=seq(from=20, to=200, by=20), cex = .7, line = .6)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
