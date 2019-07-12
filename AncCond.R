@@ -25,11 +25,11 @@
 
 ## mat transition matrix for make.simmap
 
-## pi same values possible as make.simmap: "equal", "estimated" vector length
+## pi same values possible as make.simmap: "equal", "estimated", or vector length
 ## 2 with probabilities for each state
-# pi <- c(1,0)
-# drop.state <- 2
+## n.tails either 1 or 2 depending on whether user has apriori hypothesis about a certain state
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
+  trees$edge.length <- trees$edge.length / max(branching.times(trees))
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
@@ -39,14 +39,15 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     ct.data <- data[(data[, 3] != drop.state),]
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
-    ct.vec <- ct.vec[!is.na(ct.vec)]
   }else{
     ct.data <- data
     ct.vec <- as.numeric(ct.data[, 2])
     names(ct.vec) <- ct.data[, 1]
-    ct.vec <- ct.vec[!is.na(ct.vec)]
   }
-  
+  if(sum(is.na(ct.vec)) > 0 | sum(is.na(dt.vec)) > 0){
+    stop('There exists missing trait data for some species in the phylogeny.\n
+         Please remove such taxa from the tree.')
+  }
   ## ASR for the continuous trait
   anc.states.cont.trait <- anc.ML(trees, ct.vec, model = "BM")
   
@@ -71,7 +72,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   wanted_branches <- ss_nodes[ss_nodes == T]
   wanted_nodes <- names(wanted_branches)
   
-  if(sum(mat == c(0,2,1,0)) == 4){
+  if(sum(mat) > 1){
     # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
     producing.nodes12 <- c()
     producing.nodes21 <-c()

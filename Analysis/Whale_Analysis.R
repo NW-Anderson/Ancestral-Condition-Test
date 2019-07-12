@@ -6,6 +6,7 @@ library(doSNOW)
 library(foreach)
 
 tree <- read.tree(file = 'Data/whales.tre')
+tree$edge.length <- tree$edge.length / max(branching.times(tree))
 sizes <- read.csv('Data/whale_sizes.csv')
 source('AncCond.R')
 
@@ -17,14 +18,14 @@ registerDoSNOW(cl)
 
 reordered.sizes <- rep(NA, length = length(tree$tip.label))
 names(reordered.sizes) <- tree$tip.label
-
 for(i in 1:length(sizes$Australophocaena.dioptrica)){
   reordered.sizes[match(gsub( ' ', '_', as.character(sizes$Australophocaena.dioptrica[[i]])),
                         names(reordered.sizes))] <- sizes$X1.86[[i]]
   # if(is.na(match(gsub( ' ', '_', as.character(sizes$Australophocaena.dioptrica[[i]])),
   #                 names(reordered.sizes)))){stop(cat('i = ',i))}
 }
-
+reordered.sizes <- reordered.sizes[!is.na(reordered.sizes)]
+tree <- keep.tip(tree, names(reordered.sizes))
 sig.vector <- foreach(i = 1:100, .options.multicore=opts, .combine = 'c', 
                       .packages=c("phytools","diversitree","geiger")) %dopar% {
                         good.sim <- F
