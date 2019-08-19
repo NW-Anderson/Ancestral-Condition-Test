@@ -217,20 +217,20 @@ for(i in 1:10){
 }
 
 plot(x, c(NA,probs[2:10]), type = 'b', xaxt="n",xlab="", ylab= "",
-     pch='O',cex=1.1, 
+     pch='o',cex=1.5, 
      main = 'Strength of Correlation vs Power and False Positive', 
-     adj = 0, ylim = c(0,1), col = 'blue', lwd = 4)
-points(x = 1, probs[1], pch = 'O', cex = 1.1, col = 'red')
+     adj = 0, ylim = c(0,.8), col = 'blue', lwd = 4)
+points(x = 1, probs[1], pch = 'o', cex = 1.5, col = 'red')
 lines(x, c(NA,probs2[2:10]), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
 points(x = 1, probs2[1], pch = '+', cex = 1.5, col = 'red')
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
 mtext("Percent Significant", side=2, line=2.2)
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)','Power (Correlation)',
-                  'Unidirectional','Bidirectional'), 
-       col = c('red', 'blue','black','black'), pch = c(15,15, NA, NA), bty = 'n',
-       lwd = 1.5, lty = c(NA,NA,1,2))
+legend(x = 'topleft', 
+       legend = c('Unidirectional Power','Bidirectional Power',
+                  'Unidirectional False Positive', 'Bidirectional False Positive'), 
+       col = c('blue', 'blue','red','red'), pch = c(NA,NA,'o','+'), bty = 'n',
+       lwd = 2, lty = c(1,2,NA,NA))
 
 
 ##### Fig 3 #####
@@ -291,18 +291,19 @@ for(i in 1:10){
   
 }
 plot(x, (probs/100), type = 'b', xaxt="n",xlab="", ylab= "",
-     pch='O',cex=1.1, 
+     pch='o',cex=1.1, 
      main = 'Taxa Number vs Power and False Positive', 
-     adj = 0, ylim = c(0,.75), col = 'blue', lwd = 4)
-lines(x, (probsfp/100), type = 'b', pch = 'O', cex = 1.1, col = 'red', lwd = 4, lty = 1)
+     adj = 0, ylim = c(0,.8), col = 'blue', lwd = 4)
+lines(x, (probsfp/100), type = 'b', pch = 'o', cex = 1.1, col = 'red', lwd = 4, lty = 1)
 lines(x, (biprobs/100), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
 lines(x, (biprobsfp/100), type = 'b', pch = '+', cex = 1.5, col = 'red', lwd = 4, lty = 2)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
       at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
 mtext("Taxa", side=1, line=1)
 mtext("Percent Significant", side=2, line=2.2)
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)','Power (Correlation)',
-                  'Unidirectional Evolution','Bidirectional Evolution'), 
-       col = c('red', 'blue','black','black'), pch = c(15,15, NA, NA), bty = 'n',
-       lwd = 1.5, lty = c(NA,NA,1,2))
+legend(x = 'topleft', 
+       legend = c('Unidirectional Power','Bidirectional Power',
+                  'Unidirectional False Positive', 'Bidirectional False Positive'), 
+       col = c('blue', 'blue','red','red'), bty = 'n',
+       lwd = 2, lty = c(1,2,1,2))
+
