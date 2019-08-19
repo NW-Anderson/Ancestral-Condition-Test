@@ -290,6 +290,7 @@ for(i in 1:10){
             digits = 0)
   
 }
+
 plot(x, (probs/100), type = 'b', xaxt="n",xlab="", ylab= "",
      pch='o',cex=1.1, 
      main = 'Taxa Number vs Power and False Positive', 
