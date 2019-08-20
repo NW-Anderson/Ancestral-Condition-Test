@@ -22,9 +22,13 @@ source('AncCond.R', local = TRUE)
 
 pval.array <- p.val.array <- array(dim = c(n.trees, 2))
 
-pval.array<-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind', 
-                    .packages=c("phytools","diversitree","geiger", 'coda')) %dopar%{
+# pval.array<-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind', 
+#                     .packages=c("phytools","diversitree","geiger", 'coda')) %dopar%{
                       
+                      
+                      
+                      
+                      for(t in 1:n.trees){
                       trees <- trees(pars = c(3,1),
                                      type = "bd",
                                      n = 1,
@@ -113,16 +117,18 @@ pval.array<-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind',
                       row.names(X) <- trees$tip.label
                       X <- as.matrix(X)
                       sample <- 1000 # sample every 1000 steps
-                      ngen <- 500000 # chain length, > 2 million is suggested
+                      ngen <- 50000 # chain length, > 2 million is suggested
                       burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
                       thresh <- threshBayes(trees, X, ngen = ngen,
                                             control = list(sample = sample))
-                      thresh <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
-                      class(thresh) <- 'mcmc'
-                      thresh <- HPDinterval(thresh)
-                      if(sign(thresh[1,1]) == sign(thresh[1,2])){thresh <- F}
-                      if(sign(thresh[1,1]) != sign(thresh[1,2])){thresh <- T}
-                      results <- c((pagel < 0.05), thresh)
+                      thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
+                      class(thresh1) <- 'mcmc'
+                      thresh2 <- HPDinterval(thresh1)
+                      if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- F}
+                      if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- T}
+                      results <- c((pagel < 0.05), thresh3)
                       
                       results
+                      pval.array[t,] <- results
+                      rm(thresh,thresh1,thresh2,thresh3)
                     }
