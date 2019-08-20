@@ -72,7 +72,7 @@ library(geiger)
 library(doSNOW)
 library(foreach)
 ##### Fig 1 #####
-par(mfrow = c(2,2))
+par(mfrow = c(2,2), mar = c(4,4,0,0) + .1)
 # trees <- trees(pars = c(3,1),
 #                        type = "bd",
 #                        n = 1,
@@ -91,7 +91,7 @@ smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
 gradientLegend(depth = .03, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
 legend(x = 'bottomleft', legend = '', title = '         Cont Trait Value', bg="transparent", bty = 'n')
-fig_label('A:',cex = 2.5)
+fig_label('A',cex = 2.5)
 
 # cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
 # branch.means <- c()
@@ -142,9 +142,9 @@ fig_label('A:',cex = 2.5)
 #                             message = F)
 
 load('Data/Fig1DiscSimMap.RData')
-plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
+plotSimmap(anc.state.dt, lwd = 4, ftype = 'off')
 legend(x = 'bottomleft', legend = c('Ancestral','Derived'), col = c('black', 'red'), pch = 15, bty = 'n')
-fig_label('B:',cex = 2.5)
+fig_label('B',cex = 2.5)
 
 
 pies <- array(dim = c(anc.state.dt$Nnode, 3))
@@ -158,11 +158,11 @@ pies[21,] <- t(c(0,0,1))
 pies[22:23,] <- rep.row(c(0,1,0),2)
 pies[24:29,] <- rep.row(c(1,0,0),6)
 # plot(trees, tip.color = 'transparent', edge.width = 3)
-plotSimmap(anc.state.dt, lwd = 3, ftype = 'off')
+plotSimmap(anc.state.dt, lwd = 4, ftype = 'off')
 nodelabels(pie = pies, piecol = c('blue','green', 'red'),cex = .8)
 legend(x = 'bottomleft', legend = c('Ancestral','Producing (Ancestral)','Derived'),
        col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
-fig_label('C:',cex = 2.5)
+fig_label('C',cex = 2.5)
 
 ss_nodes <- anc.state.dt$mapped.edge[, 1] > 0 &
   anc.state.dt$mapped.edge[, 2] > 0
@@ -186,12 +186,12 @@ for (j in 1:1000){
 par(mar = c(4,4,0,0) + .1)
 plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
 abline(v = orig.val, col = 'red')
-legend(x = 'topright', legend = c('Producing','All'), col = c('red', 'black'), pch = 15, bty = 'n')
-fig_label('D:',cex = 2.5)
+legend(x = 'topright', legend = c('Producing','All Ancestral'), col = c('red', 'black'), pch = 15, bty = 'n')
+fig_label('D',cex = 2.5)
 
 ##### Fig 2 #####
 par(mfrow = c(1,1), mar = c(5,4,4,2) + .1)
-load('Data/Fig2Data.RData')
+load('Data/Fig2UniData.RData')
 
 
 probs <- vector()
@@ -199,7 +199,7 @@ for(i in 1:10){
   probs[i] <- sum(fig2.data[1:100, i] <= .05) / 100
 }
 x <- rep(1:10)
-load('Data/Fig4Data.RData')
+load('Data/Fig2BiData.RData')
 
 
 y <- vector()
@@ -216,16 +216,17 @@ for(i in 1:10){
                       sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),digits = 2)
 }
 
-plot(x, c(NA,probs[2:10]), type = 'b', xaxt="n",xlab="", ylab= "",
+plot(x, probs, type = 'b', xaxt="n",xlab="", ylab= "",
      pch='o',cex=1.5, 
      main = 'Strength of Correlation vs Power and False Positive', 
      adj = 0, ylim = c(0,.8), col = 'blue', lwd = 4)
 points(x = 1, probs[1], pch = 'o', cex = 1.5, col = 'red')
-lines(x, c(NA,probs2[2:10]), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
+lines(x, probs2, type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
 points(x = 1, probs2[1], pch = '+', cex = 1.5, col = 'red')
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
 mtext("Percent Significant", side=2, line=2.2)
+abline(h = .05, lty = 2)
 legend(x = 'topleft', 
        legend = c('Unidirectional Power','Bidirectional Power',
                   'Unidirectional False Positive', 'Bidirectional False Positive'), 
@@ -235,9 +236,9 @@ legend(x = 'topleft',
 
 ##### Fig 3 #####
 
-load('Data/Fig3pt5Data.RData')
+load('Data/Fig3UniFPData.RData')
 fig3pt5.data <- fig3.data
-load('Data/Fig3Data.RData')
+load('Data/Fig3UniPowerData.RData')
 
 x <- seq(from=20, to=200, by=20)
 y <- vector()
@@ -253,8 +254,8 @@ for(i in 1:10){
   probsfp[i] <- sum(fig3pt5.data[1:100, i] <= .05)
 }
 
-load('Data/Fig5Data.RData')
-load('Data/Fig5pt5Data.RData')
+load('Data/Fig3BiPowerData.RData')
+load('Data/Fig3BiFPData.RData')
 
 y <- vector()
 for(i in 1:10){
@@ -298,6 +299,7 @@ plot(x, (probs/100), type = 'b', xaxt="n",xlab="", ylab= "",
 lines(x, (probsfp/100), type = 'b', pch = 'o', cex = 1.1, col = 'red', lwd = 4, lty = 1)
 lines(x, (biprobs/100), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
 lines(x, (biprobsfp/100), type = 'b', pch = '+', cex = 1.5, col = 'red', lwd = 4, lty = 2)
+abline(h = .05, lty = 2)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
       at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
 mtext("Taxa", side=1, line=1)

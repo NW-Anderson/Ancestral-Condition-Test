@@ -51,8 +51,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
                                                                                state')}}
   if(n.tails != 1 & n.tails != 2){stop('n.tails should be numeric 1 or 2')}
   #####
-  ## unit lengthing tree
-  trees$edge.length <- trees$edge.length / max(branching.times(trees))
+
   ## create named vector for disc trait for all taxa
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
