@@ -194,94 +194,14 @@ par(mfrow = c(1,1), mar = c(5,4,4,2) + .1)
 load('Data/Fig2Data.RData')
 
 
-
-x <- rep(1:10, each=100)
-x <- jitter(x, factor=1.5)
-y <- vector()
-for(i in 1:10){
-  y <- c(y, fig2.data[1:100, i])
-}
 probs <- vector()
 for(i in 1:10){
-  probs[i] <- paste(as.character(sum(fig2.data[1:100, i] <= .05)),'%')
+  probs[i] <- sum(fig2.data[1:100, i] <= .05) / 100
 }
-plot(x = x, y = y, xaxt="n",xlab="", ylab= "",
-     pch=16,cex=.49, 
-     main = 'Unidirectional Evolution', 
-     adj = 0, ylim = c(0,.57))
-points(x = x[1:100], y = y[1:100], pch = 16,
-       cex = .49, col = 'red')
-points(x = x[101:1000], y = y[101:1000], pch = 16,
-       cex = .49, col = 'blue')
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)',
-                  'Power (Correlation)'), 
-       col = c('red', 'blue'), pch = 16, bty = 'n')
-mtext(probs[1], side=3, at=1, cex=.7, col = 'red')
-mtext(probs[2:10], side=3, at=2:10, cex=.7, col = 'blue')
-mtext(1:10, side=1, at=1:10, cex=.85)
-mtext("Scaling Factor", side=1, line=1)
-mtext("p-value", side=2, line=2.2)
-abline(h = .05, lty = 2, lwd = .7)
-
-##### Origins Figure ##### ????????
-
-##### Fig 3 #####
-load('Data/Fig3pt5Data.RData')
-fig3pt5.data <- fig3.data
-load('Data/Fig3Data.RData')
-
-# data <- cbind(rep(1:10, each = 100), 
-#               as.vector(fig2.data))
-# colnames(data) <- c('Scale.Factor','Pval')
-
-
-x <- rep(seq(from=20, to=200, by=20), each=100)
-x <- jitter(x, factor=.9)
-y <- vector()
-for(i in 1:10){
-  y <- c(y, fig3.data[1:100, i])
-}
-probs <- vector()
-for(i in 1:10){
-  probs[i] <- paste(as.character(sum(fig3.data[1:100, i] <= .05)),'%')
-}
-probsfp <- vector()
-for(i in 1:10){
-  probsfp[i] <- paste(as.character(sum(fig3pt5.data[1:100, i] <= .05)), '%')
-}
-plot(x = (x+3), y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.49, xlim=c(10, 210), 
-     main = 'Unidirectional Evolution', adj = 0,
-     col = 'blue', ylim = c(0,.57))
-
-x <- rep(seq(from=20, to=200, by=20), each=100)
-x <- jitter(x, factor=.9)
-y <- vector()
-for(i in 1:10){
-  y <- c(y, fig3pt5.data[1:100, i])
-}
-points(x = (x-3), y = y, col = 'red', pch = 16, cex = .49)
-mtext(probs, 
-      side=3, at=seq(from=23, to=203, by=20), 
-      cex=.7, col = 'blue')
-mtext(probsfp, side = 3, at=seq(from=17, to=197, by=20), 
-      cex = .7, col = 'red')
-mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
-      at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
-mtext("Taxa", side=1, line=1)
-mtext("p-value", side=2, line=2.2)
-abline(h = .05, lty = 2, lwd = .7)
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)',
-                  'Power (Correlation)'), 
-       col = c('red', 'blue'), pch = 16, bty = 'n')
-
-##### Fig 4 #####
+x <- rep(1:10)
 load('Data/Fig4Data.RData')
 
-x <- rep(1:10, each=200)
-x <- jitter(x, factor=1.5)
+
 y <- vector()
 for(j in 1:10){
   for(i in 1:100){
@@ -290,45 +210,52 @@ for(j in 1:10){
                                                             nchar(fig4.data[i,j])))
   }
 }
-probs <- vector()
-probs2 <- c()
+probs2 <- vector()
 for(i in 1:10){
-  probs[i] <- paste(
-    as.character(
-      round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
-            digits = 0)),'%')
-  probs2[i] <- paste(
-    as.character(
-      round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .05, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
-            digits = 0)),'%')
+  probs2[i] <- round(sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / 
+                      sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),digits = 2)
 }
-plot(x = x, y = y, xaxt="n",xlab="",
-     ylab= "", pch=16,cex=.49, 
-     main = 'Bidirectional Evolution', adj = 0,
-     ylim = c(0,.57))
-points(x = x[1:200], y = y[1:200], pch = 16,
-       cex = .49, col = 'red')
-points(x = x[201:2000], y = y[201:2000], pch = 16,
-       cex = .49, col = 'blue')
-mtext(probs[1], side=3, at=1, cex=.7, col = 'red')
-mtext(probs[2:10], side=3, at=2:10, cex=.7, col = 'blue')
-# mtext(probs2, side = 3, at = 1:10, cex = .7, line = .6, col = 'red')
+
+plot(x, c(NA,probs[2:10]), type = 'b', xaxt="n",xlab="", ylab= "",
+     pch='o',cex=1.5, 
+     main = 'Strength of Correlation vs Power and False Positive', 
+     adj = 0, ylim = c(0,.8), col = 'blue', lwd = 4)
+points(x = 1, probs[1], pch = 'o', cex = 1.5, col = 'red')
+lines(x, c(NA,probs2[2:10]), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
+points(x = 1, probs2[1], pch = '+', cex = 1.5, col = 'red')
 mtext(1:10, side=1, at=1:10, cex=.85)
 mtext("Scaling Factor", side=1, line=1)
-mtext("p-value", side=2, line=2.2)
-abline(h = .025, lty = 2, lwd = .7)
-# abline(h = .05, lty = 2, lwd = .7)
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)',
-                  'Power (Correlation)'), 
-       col = c('red', 'blue'), pch = 16, bty = 'n')
+mtext("Percent Significant", side=2, line=2.2)
+legend(x = 'topleft', 
+       legend = c('Unidirectional Power','Bidirectional Power',
+                  'Unidirectional False Positive', 'Bidirectional False Positive'), 
+       col = c('blue', 'blue','red','red'), pch = c(NA,NA,'o','+'), bty = 'n',
+       lwd = 2, lty = c(1,2,NA,NA))
 
-##### Fig 5 #####
+
+##### Fig 3 #####
+
+load('Data/Fig3pt5Data.RData')
+fig3pt5.data <- fig3.data
+load('Data/Fig3Data.RData')
+
+x <- seq(from=20, to=200, by=20)
+y <- vector()
+for(i in 1:10){
+  y <- c(y, fig3.data[1:100, i])
+}
+probs <- vector()
+for(i in 1:10){
+  probs[i] <- sum(fig3.data[1:100, i] <= .05)
+}
+probsfp <- vector()
+for(i in 1:10){
+  probsfp[i] <- sum(fig3pt5.data[1:100, i] <= .05)
+}
+
 load('Data/Fig5Data.RData')
-load('MC_BiNtaxa_fp.RData')
-# with rate = 3 there is still 14%NA values. Should I go higher??? #
-x <- rep(seq(from=20, to=200, by=20), each=200)
-x <- jitter(x, factor=.9)
+load('Data/Fig5pt5Data.RData')
+
 y <- vector()
 for(i in 1:10){
   for(j in 1:10){
@@ -339,25 +266,13 @@ for(i in 1:10){
     }
   }
 }
-probs <- vector()
-probs2 <- vector()
+biprobs <- vector()
 for(i in 1:10){
-  probs[i] <- paste(
-    as.character(
+  biprobs[i] <- 
       round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
-            digits = 0)),'%')
-  probs2[i] <- paste(
-    as.character(
-      round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .05, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
-            digits = 0)),'%')
+            digits = 0)
 }
-plot(x = (x+3), y = y, xlab="", ylab= "", xaxt="n", 
-     pch=16,cex=.49, xlim=c(10, 210),
-     main = 'Bidirectional Evolution', adj = 0,
-     ylim = c(0,.57), col = 'blue')
 
-x <- rep(seq(from=20, to=200, by=20), each=200)
-x <- jitter(x, factor=.9)
 y <- vector()
 for(i in 1:10){
   for(j in 1:10){
@@ -368,30 +283,28 @@ for(i in 1:10){
     }
   }
 }
-probsfp <- vector()
+biprobsfp <- vector()
 for(i in 1:10){
-  probsfp[i] <- paste(
-    as.character(
-      round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
-            digits = 0)),'%')
-
+  biprobsfp[i] <- round(100 * sum(y[(200 * (i - 1) + 1):(200 * i)] <= .025, na.rm = T) / 
+                          sum(!is.na(y[(200 * (i - 1) + 1):(200 * i)])),
+            digits = 0)
+  
 }
-points(x = (x-3), y = y, col = 'red', pch = 16, cex = .49)
-mtext(probs, 
-      side=3, at=seq(from=23, to=203, by=20), 
-      cex=.7, col = 'blue')
-mtext(probsfp, side = 3, at=seq(from=17, to=197, by=20), 
-      cex = .7, col = 'red')
-# mtext(probs2, 
-#       side = 3, at=seq(from=20, to=200, by=20), cex = .7, line = .6)
+
+plot(x, (probs/100), type = 'b', xaxt="n",xlab="", ylab= "",
+     pch='o',cex=1.1, 
+     main = 'Taxa Number vs Power and False Positive', 
+     adj = 0, ylim = c(0,.8), col = 'blue', lwd = 4)
+lines(x, (probsfp/100), type = 'b', pch = 'o', cex = 1.1, col = 'red', lwd = 4, lty = 1)
+lines(x, (biprobs/100), type = 'b', pch = '+', cex = 1.5, col = 'blue', lwd = 4, lty = 2)
+lines(x, (biprobsfp/100), type = 'b', pch = '+', cex = 1.5, col = 'red', lwd = 4, lty = 2)
 mtext(c(20,40,60,80,100,120,140,160,180,200), side=1, 
       at=c(20,40,60,80,100,120,140,160,180,200), cex=.85)
 mtext("Taxa", side=1, line=1)
-mtext("p-value", side=2, line=2.2)
-abline(h = .025, lty = 2, lwd = .7)
-# abline(h = .05, lty = 2, lwd = .7)
-legend(x = 'topright', 
-       legend = c('False Positive (No Correlation)',
-                  'Power (Correlation)'), 
-       col = c('red', 'blue'), pch = 16, bty = 'n')
+mtext("Percent Significant", side=2, line=2.2)
+legend(x = 'topleft', 
+       legend = c('Unidirectional Power','Bidirectional Power',
+                  'Unidirectional False Positive', 'Bidirectional False Positive'), 
+       col = c('blue', 'blue','red','red'), bty = 'n',
+       lwd = 2, lty = c(1,2,1,2))
 
