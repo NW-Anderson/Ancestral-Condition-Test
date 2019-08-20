@@ -43,7 +43,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
                                                    (tip labels, cont data, discrete data)')}
   if(class(mc) != 'numeric' | round(mc) != mc | mc < 1){stop('mc should be a numeric positive integer integer')}
   if(!drop.state %in% c(1,2,NULL)){stop('drop.state must be NULL, or numeric 1 or 2')}
-  if(sum(mat == c(0,0,1,0)) == 4 | sum(mat == c(0,1,1,0)) == 4 | sum(mat == c(0,2,1,0)) == 4){
+  if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
     stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
   }
   if(!pi %in% c('equal', 'estimated')){if(length(pi) != 2 | sum(pi) != 1){stop('pi must be equal, estimated or a vector of length 2
