@@ -132,3 +132,6 @@ pval.array <- p.val.array <- array(dim = c(n.trees, 2))
                       pval.array[t,] <- results
                       rm(thresh,thresh1,thresh2,thresh3)
                     }
+
+pagel.power <- sum(pval.array[,1])
+thresh.power <- sum(pval.array[,2])

@@ -15,7 +15,7 @@ message <- T
 source('AncCond.R', local = TRUE)
 total.sims <- 0
 total.bad <- 0
-for(i in 1:100){
+for(i in 1:1000){
   
   trees <- trees(pars = c(3,1),
                  type = "bd",
@@ -94,3 +94,6 @@ for(i in 1:100){
   total.sims <- total.sims + bad.count + 1
   total.bad <- total.bad + bad.count
 }
+final.prop <- total.bad / total.sims
+final.prop
+save(final.prop, file = 'PercentDiscarded.RData')
