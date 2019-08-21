@@ -96,4 +96,4 @@ for(i in 1:1000){
 }
 final.prop <- total.bad / total.sims
 final.prop
-save(final.prop, file = 'PercentDiscarded.RData')
+# save(final.prop, file = 'PercentDiscarded.RData')

@@ -124,8 +124,8 @@ pval.array <- p.val.array <- array(dim = c(n.trees, 2))
                       thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
                       class(thresh1) <- 'mcmc'
                       thresh2 <- HPDinterval(thresh1)
-                      if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- F}
-                      if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- T}
+                      if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
+                      if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
                       results <- c((pagel < 0.05), thresh3)
                       
                       results
