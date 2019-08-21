@@ -3,10 +3,11 @@ library(geiger)
 library(phytools)
 
 sig.array <- array(dim = c(100, 3))
-for(i in 1:100){
+for(l in 1:100){
   # make data
   tree <- trees(pars= c(3, 1), max.taxa = 200, type="bd", include.extinct = F)[[1]]
   tree$edge.length <- tree$edge.length/max(branching.times(tree))
+  cont.trait <- sim.char(tree, 0.2)[,,1]
   # reconstruct values
   anc.states <- anc.ML(tree, cont.trait)
   node.vals <- anc.states$ace
@@ -24,7 +25,7 @@ for(i in 1:100){
   }
   
   # this is the key node 
-  names(node.vals)[i]
+  # names(node.vals)[i]
   
   # get the tips that belong to it
   node.plus.tips <- getDescendants(tree, node=names(node.vals)[i])
@@ -36,7 +37,7 @@ for(i in 1:100){
   
   # fitDiscrete(tree, disc.char, model = "ARD")
   anc.state.dt <- make.simmap(tree, disc.char,
-                              model = matrix( c(0,0,1,0), 2),
+                              model = matrix(c(0,2,1,0), 2),
                               nsim = 1,
                               pi = c(1,0),
                               message = F)
@@ -62,7 +63,7 @@ for(i in 1:100){
   ngen <- 50000 # chain length, > 2 million is suggested
   burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
   thresh <- threshBayes(tree, X, ngen = ngen,
-                        control = list(sample = sample))
+                        control = list(sample = sample, quiet=TRUE))
   thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
   class(thresh1) <- 'mcmc'
   thresh2 <- HPDinterval(thresh1)
@@ -77,8 +78,9 @@ for(i in 1:100){
                   data = dat, 
                   drop.state = 2, 
                   mat = c(0,0,1,0), 
-                  pi = c(1,0))
+                  pi = c(1,0),
+                  message = F)
   results <- c(results, rslt$pval < .05)
-  cat(results,'\n')
-  sig.array[i,] <- results
+  cat(paste(l,sum(sig.array[,1],na.rm = T),sum(sig.array[,2],na.rm = T),sum(sig.array[,1],na.rm = T)),'\n')
+  sig.array[l,] <- results
 }
