@@ -2,7 +2,8 @@ library(diversitree)
 library(geiger)
 library(phytools)
 
-sig.array <- array(dim = c(100, 3))
+
+# sig.array <- array(dim = c(100, 3))
 for(l in 1:100){
   # make data
   tree <- trees(pars= c(3, 1), max.taxa = 200, type="bd", include.extinct = F)[[1]]
@@ -69,18 +70,20 @@ for(l in 1:100){
   thresh2 <- HPDinterval(thresh1)
   if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
   if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
-  results <- c((pagel < 0.05), thresh3)
+  results <- c((pagel < 0.025), thresh3)
   
   # anccond test
   dat <- cbind(tree$tip.label, cont.trait, disc.char)
   
   rslt <- AncCond(trees = tree, 
                   data = dat, 
-                  drop.state = 2, 
-                  mat = c(0,0,1,0), 
-                  pi = c(1,0),
                   message = F)
-  results <- c(results, rslt$pval < .05)
-  cat(paste(l,sum(sig.array[,1],na.rm = T),sum(sig.array[,2],na.rm = T),sum(sig.array[,1],na.rm = T)),'\n')
+  if(is.na(rslt$`pval2->1`)){
+    results <- c(results, (rslt$`pval1->2` < .025))
+  }else {
+  results <- c(results, (rslt$`pval1->2` < .025 | rslt$`pval2->1` < .025))
+  }
+  cat(paste(l,sum(sig.array[,1],na.rm = T),sum(sig.array[,2],na.rm = T),
+            sum(sig.array[,1],na.rm = T)),'\n')
   sig.array[l,] <- results
 }
