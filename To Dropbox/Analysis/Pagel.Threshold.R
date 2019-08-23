@@ -1,3 +1,9 @@
+
+# install.packages("phytools")
+# install.packages("diversitree")
+# install.packages("geiger")
+# install.packages("coda")
+library(coda)
 library(R.utils)
 library(phytools)
 library(diversitree)
@@ -13,10 +19,11 @@ n.trees <- 100
 n.taxa <- 200
 message <- T
 source('AncCond.R', local = TRUE)
-total.sims <- 0
-total.bad <- 0
-for(i in 1:1000){
-  
+
+pval.array <- p.val.array <- array(dim = c(n.trees, 2))
+
+
+for(t in 1:n.trees){
   trees <- trees(pars = c(3,1),
                  type = "bd",
                  n = 1,
@@ -65,8 +72,9 @@ for(i in 1:1000){
   upper <- summary(branch.means)[[5]]
   lower <- summary(branch.means)[[2]]
   
+  # next we perform the following analysis on this tree for each of the scaling factors
   
-  scale.factor <- 10
+  scale.factor <- 1
   # we leave the original trees un altered 
   alt.tree <- trees 
   
@@ -78,7 +86,6 @@ for(i in 1:1000){
   # next we simulated a discrete trait on this altered tree
   # while loop is set up to make sure sufficient transitions occur on the tree
   good.sim <- F
-  bad.count <- 0
   rate <- .1
   while(good.sim == F){
     disc.trait <- sim.char(phy = alt.tree,
@@ -88,12 +95,38 @@ for(i in 1:1000){
     if((0.05 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
        sum(disc.trait == min(disc.trait)) < (.95 * n.taxa)){
       good.sim <- T
-    }else{bad.count <- bad.count + 1}
-    
+    }
   }
-  total.sims <- total.sims + bad.count + 1
-  total.bad <- total.bad + bad.count
+  # creating the discretized cont trait for pagels test
+  mdn <- summary(cont.trait)[3]
+  disc.cont.trait <- cont.trait > mdn
+  disc.cont.trait <- as.character(as.vector(disc.cont.trait) + 1)
+  disc.trait <- as.vector(as.character(disc.trait))
+  names(disc.cont.trait) <- names(disc.trait) <- trees$tip.label
+  # doing pagels test
+  pagel <- fitPagel(trees, disc.trait, disc.cont.trait, method = 'fitDiscrete')$P
+  
+  # threshold test
+  X <- cbind((as.numeric(disc.trait) - 1),as.vector(cont.trait))
+  colnames(X) <- c('disc.trait', 'cont.trait')
+  row.names(X) <- trees$tip.label
+  X <- as.matrix(X)
+  sample <- 1000 # sample every 1000 steps
+  ngen <- 50000 # chain length, > 2 million is suggested
+  burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
+  thresh <- threshBayes(trees, X, ngen = ngen,
+                        control = list(sample = sample))
+  thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
+  class(thresh1) <- 'mcmc'
+  thresh2 <- HPDinterval(thresh1)
+  if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
+  if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
+  results <- c((pagel < 0.05), thresh3)
+  
+  results
+  pval.array[t,] <- results
+  rm(thresh,thresh1,thresh2,thresh3)
 }
-final.prop <- total.bad / total.sims
-final.prop
-# save(final.prop, file = 'PercentDiscarded.RData')
+
+pagel.power <- sum(pval.array[,1])
+thresh.power <- sum(pval.array[,2])

@@ -79,7 +79,7 @@ pval.array <- p.val.array <- array(dim = c(n.trees, 2))
                       
                       # next we perform the following analysis on this tree for each of the scaling factors
                       
-                      scale.factor <- 5
+                      scale.factor <- 1
                       # we leave the original trees un altered 
                       alt.tree <- trees 
                       
