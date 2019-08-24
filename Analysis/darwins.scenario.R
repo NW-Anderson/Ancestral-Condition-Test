@@ -1,10 +1,13 @@
+library(coda)
 library(diversitree)
 library(geiger)
 library(phytools)
-
-
-# sig.array <- array(dim = c(100, 3))
-for(l in 1:100){
+source('AncCond.R')
+l = 1
+sig.array <- array(dim = c(100, 3))
+while(l < 100){
+#for(l in 1:100){
+  tryCatch({
   # make data
   tree <- trees(pars= c(3, 1), max.taxa = 200, type="bd", include.extinct = F)[[1]]
   tree$edge.length <- tree$edge.length/max(branching.times(tree))
@@ -86,4 +89,7 @@ for(l in 1:100){
   cat(paste(l,sum(sig.array[,1],na.rm = T),sum(sig.array[,2],na.rm = T),
             sum(sig.array[,1],na.rm = T)),'\n')
   sig.array[l,] <- results
+  l <- l + 1
+  }, 
+  error = function(e){cat(' ERROR ')})
 }
