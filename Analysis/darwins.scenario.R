@@ -1,13 +1,10 @@
-library(coda)
 library(diversitree)
 library(geiger)
 library(phytools)
-source('AncCond.R')
-l = 1
-sig.array <- array(dim = c(100, 3))
-while(l < 100){
-#for(l in 1:100){
-  tryCatch({
+
+
+# sig.array <- array(dim = c(100, 3))
+for(l in 1:100){
   # make data
   tree <- trees(pars= c(3, 1), max.taxa = 200, type="bd", include.extinct = F)[[1]]
   tree$edge.length <- tree$edge.length/max(branching.times(tree))
@@ -39,9 +36,9 @@ while(l < 100){
   
   disc.char[names(disc.char) %in% tree$tip.label[tips]] <- 2
   
-  # fitDiscrete(tree, disc.char, model = "ARD")
+  # fitDiscrete(tree, disc.char, model = matrix(c(0,0,1,0), 2))
   anc.state.dt <- make.simmap(tree, disc.char,
-                              model = matrix(c(0,2,1,0), 2),
+                              model = matrix(c(0,0,1,0), 2),
                               nsim = 1,
                               pi = c(1,0),
                               message = F)
@@ -89,7 +86,4 @@ while(l < 100){
   cat(paste(l,sum(sig.array[,1],na.rm = T),sum(sig.array[,2],na.rm = T),
             sum(sig.array[,1],na.rm = T)),'\n')
   sig.array[l,] <- results
-  l <- l + 1
-  }, 
-  error = function(e){cat(' ERROR ')})
 }

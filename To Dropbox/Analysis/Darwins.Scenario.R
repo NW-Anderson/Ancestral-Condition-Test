@@ -41,7 +41,7 @@ while(l < 100){
     
     disc.char[names(disc.char) %in% tree$tip.label[tips]] <- 2
     
-    # fitDiscrete(tree, disc.char, model = "ARD")
+    # fitDiscrete(tree, disc.char, model = matrix(c(0,0,1,0), 2))
     anc.state.dt <- make.simmap(tree, disc.char,
                                 model = matrix(c(0,0,1,0), 2),
                                 nsim = 1,
