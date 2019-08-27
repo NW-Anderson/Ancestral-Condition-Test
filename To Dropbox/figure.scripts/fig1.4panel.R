@@ -72,7 +72,7 @@ library(geiger)
 library(doSNOW)
 library(foreach)
 ##### Fig 1 #####
-par(mfrow = c(2,2), mar = c(4,4,2,2) + .1)
+par(mfrow = c(2,2), mar = c(4,4,6,6) + .1)
 # trees <- trees(pars = c(3,1),
 #                        type = "bd",
 #                        n = 1,
@@ -90,7 +90,7 @@ n<-length(smp$cols)
 smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
 gradientLegend(depth = .03, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
-legend(x = 'bottomleft', legend = '', title = '         Cont Trait Value', bg="transparent", bty = 'n')
+legend(x = 'bottomleft', legend = '', title = '           Cont Trait Value', bg="transparent", bty = 'n')
 fig_label('A',cex = 2.5)
 
 # cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
@@ -183,7 +183,7 @@ for (j in 1:1000){
   null.orig.val[j] <- mean(sample(anc.cond.nodes,
                                   length(producing.nodes)))
 }
-par(mar = c(4,4,0,0) + .1)
+par(mar = c(5,5,1,1) + .1)
 plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
 abline(v = orig.val, col = 'red')
 legend(x = 'topright', legend = c('Producing','All Ancestral'), col = c('red', 'black'), pch = 15, bty = 'n')
