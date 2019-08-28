@@ -186,5 +186,5 @@ for (j in 1:1000){
 par(mar = c(5,5,1,1) + .1)
 plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
 abline(v = orig.val, col = 'red')
-legend(x = 'topright', legend = c('Producing','All Ancestral'), col = c('red', 'black'), pch = 15, bty = 'n')
+legend(x = 'topright', legend = c('Observed','Null'), col = c('red', 'black'), pch = 15, bty = 'n')
 fig_label('D',cex = 2.5)
