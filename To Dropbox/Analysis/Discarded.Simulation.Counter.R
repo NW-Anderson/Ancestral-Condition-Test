@@ -13,8 +13,7 @@ n.trees <- 100
 n.taxa <- 200
 message <- T
 source('AncCond.R', local = TRUE)
-total.sims <- 0
-total.bad <- 0
+percent.vec <- array(dim = c(100,10))
 for(i in 1:100){
   
   trees <- trees(pars = c(3,1),
@@ -66,6 +65,8 @@ for(i in 1:100){
   lower <- summary(branch.means)[[2]]
   
   for(s in 1:10){
+    total.sims <- 0
+    total.bad <- 0
     scale.factor <- s
     # we leave the original trees un altered 
     alt.tree <- trees 
@@ -91,24 +92,28 @@ for(i in 1:100){
       }else{bad.count <- bad.count + 1}
       
     }
-    total.sims <- total.sims + bad.count + 1
-    total.bad <- total.bad + bad.count
+    percent.vec[i, s] <- bad.count
   }
+  
+}
+for(i in 1:10){
+  total.sims[i] <- sum(percent.vec[,i] + 1)
+  total.bad[i] <- sum(percent.vec[,i])
 }
 final.prop <- total.bad / total.sims
-final.prop
-# save(final.prop, file = 'PercentDiscarded.RData')
+# save(final.prop, file = 'PercentDiscarded.Scaling.RData')
 
 n.trees <- 100
 scale.factor <- 5
 n.taxa <- seq(20, 200, length.out = 10)
 source('AncCond.R', local = TRUE)
 message <- T
-total.sims <- 0
-total.bad <- 0
+percent.vec <- array(dim = c(100,10))
 
 for(s in 1:10){
   for(i in 1:100){
+    total.sims <- 0
+    total.bad <- 0
     trees <- trees(pars = c(3,1),
                    type = "bd",
                    n = 1,
@@ -184,9 +189,12 @@ for(s in 1:10){
       }else{bad.count <- bad.count + 1}
       
     }
-    total.sims <- total.sims + bad.count + 1
-    total.bad <- total.bad + bad.count
+    percent.vec[i, s] <- bad.count
   }
 }
+for(i in 1:10){
+  total.sims[i] <- sum(percent.vec[,i] + 1)
+  total.bad[i] <- sum(percent.vec[,i])
+}
 final.prop <- total.bad / total.sims
-final.prop
+# save(final.prop, file = 'PercentDiscardedTaxa.RData')
