@@ -78,7 +78,7 @@ while(l < 100){
     results <- c((pagel < 0.05), thresh3)
     
     # anccond test
-    dat <- cbind(tree$tip.label, cont.trait, disc.char)
+    dat <- data.frame(tree$tip.label, cont.trait, disc.char)
     
     rslt <- AncCond(trees = tree, 
                     data = dat, 

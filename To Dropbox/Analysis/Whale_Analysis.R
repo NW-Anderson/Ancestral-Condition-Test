@@ -41,7 +41,7 @@ sig.vector <- foreach(i = 1:300, .options.multicore=opts, .combine = 'c',
                           }
                         }
                         
-                        dat <- cbind(tree$tip.label, reordered.sizes, disc.trait)
+                        dat <- data.frame(tree$tip.label, reordered.sizes, disc.trait)
                         rslt <- AncCond(trees = tree, 
                                         data = dat, 
                                         drop.state = 2, 

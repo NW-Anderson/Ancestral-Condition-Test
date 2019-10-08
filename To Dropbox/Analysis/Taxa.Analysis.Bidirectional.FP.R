@@ -105,7 +105,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                             }
                             if(message == T){cat('\n')}
                             # we now apply the AncCond test to our simulated data and record its result
-                            dat <- cbind(alt.tree$tip.label, cont.trait, disc.trait)
+                            dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
                             # withTimeout({
                             rslt <- AncCond(trees = trees, 
                                             data = dat, 
