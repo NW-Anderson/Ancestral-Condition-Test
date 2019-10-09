@@ -7,9 +7,12 @@
 ##################################################################
 ##
 ## INPUT DATA
-## trees: a phylo or multiPhylo object
+## trees: a phylo object
+## - for multiphylo analysis. Loop through every tree and compile the the 
+##   of each loop to create a distribution of observed values and a multiphylo 
+##   null distribution
 
-## data: a dataframe with three collumns (Labels, cont trait, disc trait)
+## data: a dataframe with three columns (Labels, cont trait, disc trait)
 ## - Labels should match taxa labels in the phylogeny
 ## - continuous trait should be numeric values
 ## - discrete trait must be coded as 1 and 2 if one is ancestral then it must be coded as 1
@@ -22,22 +25,21 @@
 ## drop.state: should be NULL unless working under the assumption 
 ## that one state is ancestral and the other derived and back 
 ## transitions are not possible. Using this assumption will
-## fix the base of the tree in the ancestral condition and will
 ## ignore continuous data from taxa in the derived state
 
-## mat transition matrix for make.simmap. Should contain the rate 
-## matrix for evolution of the discrete trait
+## mat: transition matrix. Should contain the rate 
+## matrix for evolution of the discrete trait. Acceptable matrices are
+## c(0,0,1,0), c(0,1,1,0), c(0,2,1,0)
 
-## pi The probabilities the root of the tree are either of the
+## pi: The probabilities the root of the tree are either of the
 ## discrete character states same values possible as make.simmap:
 ## "equal", "estimated", or vector length 2 with probabilities 
 ## for each state
 
-## n.tails either 1 or 2 depending on whether user has apriori hypothesis about a certain state
+## n.tails: either 1 or 2 depending on whether user has apriori hypothesis about a certain state
 
 
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
-  ##### testing inputs #####
   ##### testing inputs #####
   if(class(trees) != 'phylo') {stop('trees must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
@@ -79,13 +81,11 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   
   ## ASR for discrete trait
   ## using stochastic mappings to nail down specific transition points
-  ## if(!is.null(drop.state)){
   anc.state.dt <- make.simmap(trees, dt.vec,
                               model = matrix(mat, 2),
                               nsim = 1,
                               pi = pi,
-                              message = F
-  )
+                              message = F)
   
   ## Parse simmap to get producing nodes
   # the mapped edge object has time spent in a state in
