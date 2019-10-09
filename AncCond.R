@@ -12,7 +12,7 @@
 ## data: a dataframe with three collumns (Labels, cont trait, disc trait)
 ## - Labels should match taxa labels in the phylogeny
 ## - continuous trait should be numeric values
-## - discrete trait 
+## - discrete trait must be coded as 1 and 2 if one is ancestral then it must be coded as 1
 ## There should be no missing data. If a taxa does not have available cont
 ## and discrete data, please prune it from the tree
 
@@ -38,25 +38,29 @@
 
 AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
   ##### testing inputs #####
-  # if(class(trees) != 'phylo' & class(trees) !='multiphylo'){stop('trees must be class phyllo or multiphylo')}
-  # if(class(data) != 'matrix' | ncol(data) != 3){stop('data should be a matrix with 3 columns\n
-  #                                                  (tip labels, cont data, discrete data)')}
-  # if(class(mc) != 'numeric' | round(mc) != mc | mc < 1){stop('mc should be a numeric positive integer integer')}
-  # if(!drop.state %in% c(1,2,NULL)){stop('drop.state must be NULL, or numeric 1 or 2')}
-  # if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
-  #   stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
-  # }
-  # if(!pi %in% c('equal', 'estimated')){if(length(pi) != 2 | sum(pi) != 1){stop('pi must be equal, estimated or a vector of length 2
-  #                                                                              with probabilities the root of the tree takes either discrete 
-  #                                                                              state')}}
-  # if(n.tails != 1 & n.tails != 2){stop('n.tails should be numeric 1 or 2')}
+  ##### testing inputs #####
+  if(class(trees) != 'phylo') {stop('trees must be class phylo')}
+  if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
+  if(class(mc) != 'numeric' | round(mc) != mc | mc < 1){stop('mc should be a numeric positive integer integer')}
+  if(!is.null(drop.state)) if(!drop.state %in% c(1,2)){stop('drop.state must be NULL, or numeric 1 or 2')}
+  if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
+    stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
+  }
+  
+  if((!pi %in% c('equal', 'estimated'))[1]){
+    if(!is.numeric(pi)) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
+    if(length(pi) != 2 | sum(pi) != 1) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
+  }
+  
+  if(n.tails != 1 & n.tails != 2){stop('n.tails should be numeric 1 or 2')}
+  #####
   #####
 
-  ## create named vector for disc trait for all taxa
+  ##### create named vector for disc trait for all taxa #####
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
   
-  ## create named vector for cont trait taxa not in derived state
+  ##### create named vector for cont trait taxa not in derived state #####
   if(!is.null(drop.state)){
     ct.data <- data[(data[, 3] != drop.state),]
     ct.vec <- as.numeric(ct.data[, 2])
