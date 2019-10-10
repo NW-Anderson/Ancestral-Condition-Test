@@ -69,85 +69,27 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
-library(foreach)
 ##### Fig 1 #####
 par(mfrow = c(2,2), mar = c(4,4,6,6) + .1)
-# trees <- trees(pars = c(3,1),
-#                        type = "bd",
-#                        n = 1,
-#                        max.taxa = 30,
-#                        include.extinct = F)[[1]]
-# trees$edge.length <- trees$edge.length / max(branching.times(trees))
-# cont.trait <- sim.char(trees, 0.2, model = 'BM')
-# names(cont.trait) <- trees$tip.label
-load('../Data/Fig1Tree.RData')
-load('../Data/Fig1ContTrait.RData')
+load('../../data/Fig1ExampleTree.RData')
+load('../../data/Fig1ExampleContTrait.RData')
 
-smp <- contMap(trees,cont.trait, ftype = 'off', legend = F, lims = c(.24,2), plot = F)
+smp <- contMap(Fig1.example.tree,Fig1.example.cont.trait, ftype = 'off', legend = F, lims = c(.24,2), plot = F)
 n<-length(smp$cols)
-## change to grey scale
 smp$cols[1:n]<-rainbow(n, end = 4/6)
 plot(smp, legend = F,ftype = 'off')
 gradientLegend(depth = .03, valRange = c(.24,2), side = 1, pos = .17, color = rainbow(n, end = 4/6))
-legend(x = 'bottomleft', legend = '', title = '           Cont Trait Value', bg="transparent", bty = 'n')
+legend(x = 'bottomleft', legend = '', title = '           Cont. trait value', bg="transparent", bty = 'n')
 fig_label('A',cex = 2.5)
 
-# cont.trait.AC <- anc.ML(trees, cont.trait, model = "BM")
-# branch.means <- c()
-# branch.names <- c()
-# for(j in 1:nrow(trees$edge)){
-#   node.o.int <- trees$edge[j,1]
-#   if(node.o.int <= 30){
-#     one <- cont.trait[node.o.int]
-#   }else{
-#     one <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
-#   }
-#   node.o.int <- trees$edge[j,2]
-#   if(node.o.int <= 30){
-#     two <- cont.trait[node.o.int]
-#   }else{
-#     two <- cont.trait.AC$ace[names(cont.trait.AC$ace) == as.character(node.o.int)]
-#   }
-#   branch.means <- c(branch.means, mean(one, two))
-#   branch.names <- c(branch.names, paste(as.character(trees$edge[j,1]),as.character(trees$edge[j,2])))
-# }
-# names(branch.means) <- branch.names
-# rm(branch.names)
-# upper <- summary(branch.means)[[5]]
-# lower <- summary(branch.means)[[2]]
-# scale.factor <- 50
-# alt.tree <- trees
-# for(j in 1:length(branch.means)){
-#   if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
-#   if(branch.means[j] > upper){alt.tree$edge.length[j] <- alt.tree$edge.length[j] * scale.factor}
-# }
-# good.sim <- F
-# rate <- .2
-# while(good.sim == F){
-#   disc.trait <- sim.char(phy = trees,
-#                          par = matrix(c(-rate, 0, rate, 0), 2),
-#                          model = 'discrete',
-#                          root = 1)
-#   if(4 < sum(disc.trait == min(disc.trait)) &&
-#      sum(disc.trait == min(disc.trait)) < 26){
-#     good.sim <- T
-#   }
-# }
-# names(disc.trait) <- trees$tip.label
-# anc.state.dt <- make.simmap(trees, disc.trait,
-#                             model = matrix(c(0,0,1,0), 2),
-#                             nsim = 1,
-#                             pi = c(1,0),
-#                             message = F)
 
-load('../Data/Fig1DiscSimMap.RData')
-plotSimmap(anc.state.dt, lwd = 4, ftype = 'off')
+load('../../data/Fig1ExampleDiscreteSimmap.RData')
+plotSimmap(Fig1.example.disc.simmap, lwd = 4, ftype = 'off')
 legend(x = 'bottomleft', legend = c('Ancestral','Derived'), col = c('black', 'red'), pch = 15, bty = 'n')
 fig_label('B',cex = 2.5)
 
 
-pies <- array(dim = c(anc.state.dt$Nnode, 3))
+pies <- array(dim = c(Fig1.example.disc.simmap$Nnode, 3))
 pies[1:4,] <- rep.row(c(1,0,0),4)
 pies[5,] <- t(c(0,0,1))
 pies[6:7,] <- rep.row(c(0,1,0),2)
@@ -157,24 +99,23 @@ pies[13:20,] <- rep.row(c(1,0,0),8)
 pies[21,] <- t(c(0,0,1))
 pies[22:23,] <- rep.row(c(0,1,0),2)
 pies[24:29,] <- rep.row(c(1,0,0),6)
-# plot(trees, tip.color = 'transparent', edge.width = 3)
-plotSimmap(anc.state.dt, lwd = 4, ftype = 'off')
+plotSimmap(Fig1.example.disc.simmap, lwd = 4, ftype = 'off')
 nodelabels(pie = pies, piecol = c('blue','green', 'red'),cex = .8)
 legend(x = 'bottomleft', legend = c('Ancestral','Producing (Ancestral)','Derived'),
        col = c('blue', 'red','green'), pch = 16, bg="transparent", bty = 'n')
 fig_label('C',cex = 2.5)
 
-ss_nodes <- anc.state.dt$mapped.edge[, 1] > 0 &
-  anc.state.dt$mapped.edge[, 2] > 0
+ss_nodes <- Fig1.example.disc.simmap$mapped.edge[, 1] > 0 &
+  Fig1.example.disc.simmap$mapped.edge[, 2] > 0
 wanted_branches <- ss_nodes[ss_nodes == T]
 wanted_nodes <- names(wanted_branches)
 wanted_nodes <- gsub(",.*", "", wanted_nodes)
 producing.nodes <- unique(wanted_nodes)
-anc.states <- anc.ML(trees, cont.trait, model = "BM")
+anc.states <- anc.ML(Fig1.example.tree, Fig1.example.cont.trait, model = "BM")
 orig.val <- mean(anc.states$ace[names(anc.states$ace) %in% producing.nodes])
 null.orig.val <- vector(length = 1000)
 number.of.trans <- length(producing.nodes)
-anc.dt <- anc.state.dt
+anc.dt <- Fig1.example.disc.simmap
 anc.ct <- anc.states
 node.states <- describe.simmap(anc.dt)$states
 anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in% names(node.states)[node.states != '2']]
@@ -184,7 +125,7 @@ for (j in 1:1000){
                                   length(producing.nodes)))
 }
 par(mar = c(5,5,1,1) + .1)
-plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean Cont Trait', main = '')
+plot(density(null.orig.val, bw = .025), ylab = 'Frequency', xlab = 'Mean coninuous trait', main = '')
 abline(v = orig.val, col = 'red')
-legend(x = 'topright', legend = c('Observed','Null'), col = c('red', 'black'), pch = 15, bty = 'n')
+legend(x = 1.01, y=3.4, legend = c('Empirical','Null'), col = c('red', 'black'), pch = 15, bty = 'n')
 fig_label('D',cex = 2.5)
