@@ -118,5 +118,5 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         }
                         p.val.vec
                       }
-fig4.data <- p.val.array
-save(fig4.data, file = 'Fig2BiData.RData')
+scaling.bi.results <- p.val.array
+## save(scaling.bi.results, file = 'BidirectionalScalingAnalysis.RData')

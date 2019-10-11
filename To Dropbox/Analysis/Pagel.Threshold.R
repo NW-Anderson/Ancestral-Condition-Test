@@ -128,5 +128,8 @@ for(t in 1:n.trees){
   rm(thresh,thresh1,thresh2,thresh3)
 }
 
-pagel.power <- sum(pval.array[,1])
-thresh.power <- sum(pval.array[,2])
+pagel <- sum(pval.array[,1])
+thresh <- sum(pval.array[,2])
+
+## save(pval.array, file = 'PagelThreshFP.RData')
+## save(pval.array, file = 'PagelThreshPower.RData')

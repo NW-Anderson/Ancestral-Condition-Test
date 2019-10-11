@@ -101,7 +101,7 @@ for(i in 1:10){
   total.bad[i] <- sum(percent.vec[,i])
 }
 final.prop <- total.bad / total.sims
-# save(final.prop, file = 'PercentDiscarded.Scaling.RData')
+# save(final.prop, file = 'PercentDiscardedScaling.RData')
 
 n.trees <- 100
 scale.factor <- 5
