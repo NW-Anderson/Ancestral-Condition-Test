@@ -130,5 +130,5 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                         }
                         p.val.vec
                       }
-fig5.data <- p.val.array
-save(fig5.data, file = 'Fig3BiPowerData.RData')
+taxa.bi.power.results <- p.val.array
+save(taxa.bi.power.results, file = 'BidirectionalTaxaPowerResults.RData')

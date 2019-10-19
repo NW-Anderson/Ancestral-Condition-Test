@@ -125,9 +125,5 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         }
                         p.val.vec
                       }
-fig2.data <- p.val.array
-save(fig2.data, file = 'Fig2UniData.RData')
-##### END FIGURE 2 #####
-# }
-
-# HPRCAncCondFIG2()
+scaling.uni.results <- p.val.array
+save(scaling.uni.results, file = 'UnidirectionalScalingAnalysisResults.RData')

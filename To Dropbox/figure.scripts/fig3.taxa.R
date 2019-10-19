@@ -1,35 +1,34 @@
 
 ##### Fig 3 #####
 
-load('../results/Fig3UniFPData.RData')
-fig3pt5.data <- fig3.data
-load('../results/Fig3UniPowerData.RData')
+load('../results/UnidirectionalTaxaFPResults.RData')
+load('../results/UnidirectionalTaxaPowerResults.RData')
 
 x <- seq(from=20, to=200, by=20)
 y <- vector()
 for(i in 1:10){
-  y <- c(y, fig3.data[1:100, i])
+  y <- c(y, taxa.uni.power.results[1:100, i])
 }
 probs <- vector()
 for(i in 1:10){
-  probs[i] <- sum(fig3.data[1:100, i] <= .05)
+  probs[i] <- sum(taxa.uni.power.results[1:100, i] <= .05)
 }
 probsfp <- vector()
 for(i in 1:10){
-  probsfp[i] <- sum(fig3pt5.data[1:100, i] <= .05)
+  probsfp[i] <- sum(taxa.uni.fp.results[1:100, i] <= .05)
 }
 
-load('../results/Fig3BiPowerData.RData')
-load('../results/Fig3BiFPData.RData')
+load('../results/BidirectionalTaxaPowerResults.RData')
+load('../results/BidirectionalTaxaFPResults.RData')
 
 ## THIS LOOP IS GENERATING WARNINGS CAN YOU COMMENT SO I CAN FIGURE OUT WHATS UP
 y <- vector()
 for(i in 1:10){
   for(j in 1:10){
     for(i in 1:100){
-      y[2 * (100 * (j - 1) + i - 1) + 1] <- as.numeric(gsub(",.*", "",fig5.data[i,j]))
-      y[2 * (100 * (j - 1) + i - 1) + 2] <- as.numeric(substr(fig5.data[i,j], (nchar(gsub(",.*", "",fig5.data[i,j])) + 2), 
-                                                              nchar(fig5.data[i,j])))
+      y[2 * (100 * (j - 1) + i - 1) + 1] <- as.numeric(gsub(",.*", "",taxa.bi.power.results[i,j]))
+      y[2 * (100 * (j - 1) + i - 1) + 2] <- as.numeric(substr(taxa.bi.power.results[i,j], (nchar(gsub(",.*", "",taxa.bi.power.results[i,j])) + 2), 
+                                                              nchar(taxa.bi.power.results[i,j])))
     }
   }
 }
@@ -45,9 +44,9 @@ y <- vector()
 for(i in 1:10){
   for(j in 1:10){
     for(i in 1:100){
-      y[2 * (100 * (j - 1) + i - 1) + 1] <- as.numeric(gsub(",.*", "",fig5pt5.data[i,j]))
-      y[2 * (100 * (j - 1) + i - 1) + 2] <- as.numeric(substr(fig5pt5.data[i,j], (nchar(gsub(",.*", "",fig5pt5.data[i,j])) + 2), 
-                                                              nchar(fig5pt5.data[i,j])))
+      y[2 * (100 * (j - 1) + i - 1) + 1] <- as.numeric(gsub(",.*", "",taxa.bi.fp.results[i,j]))
+      y[2 * (100 * (j - 1) + i - 1) + 2] <- as.numeric(substr(taxa.bi.fp.results[i,j], (nchar(gsub(",.*", "",taxa.bi.fp.results[i,j])) + 2), 
+                                                              nchar(taxa.bi.fp.results[i,j])))
     }
   }
 }
