@@ -1,12 +1,12 @@
-# Create testing data
+##### Create testing data ######
 library(phytools)
 library(geiger)
 library(diversitree)
 tree <- trees(pars = c(3,1),
-               type = "bd",
-               n = 1,
-               max.taxa = 100,
-               include.extinct = F)[[1]]
+              type = "bd",
+              n = 1,
+              max.taxa = 100,
+              include.extinct = F)[[1]]
 tree$edge.length <- tree$edge.length / max(branching.times(tree))
 
 # we then simulate the continious character
@@ -50,66 +50,58 @@ lower <- summary(branch.means)[[2]]
 
 # next we perform the following analysis on this tree for each of the scaling factors
 
-  scale.factor <- 5
-  # we leave the original trees un altered
-  alt.tree <- tree
+scale.factor <- 5
+# we leave the original trees un altered
+alt.tree <- tree
 
-  # we then manipulate the branch lengths of those branches whose cont trait means are in the upper or lower quartiles
-  for(j in 1:length(branch.means)){
-    if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
-    if(branch.means[j] > upper){alt.tree$edge.length[j] <- alt.tree$edge.length[j] * scale.factor}
+# we then manipulate the branch lengths of those branches whose cont trait means are in the upper or lower quartiles
+for(j in 1:length(branch.means)){
+  if(branch.means[j] < lower){alt.tree$edge.length[j] <- alt.tree$edge.length[j] / scale.factor}
+  if(branch.means[j] > upper){alt.tree$edge.length[j] <- alt.tree$edge.length[j] * scale.factor}
+}
+# next we simulated a discrete trait on this altered tree
+# while loop is set up to make sure sufficient transitions occur on the tree
+good.sim <- F
+rate <- .3
+while(good.sim == F){
+  disc.trait <- sim.char(phy = alt.tree,
+                         par = matrix(c(-rate, rate, rate, -rate), 2),
+                         model = 'discrete',
+                         root = sample(c(1,2),1))
+  if((0.05 * 100) < sum(disc.trait == min(disc.trait)) &&
+     sum(disc.trait == min(disc.trait)) < (.95 * 100)){
+    good.sim <- T
   }
-  # next we simulated a discrete trait on this altered tree
-  # while loop is set up to make sure sufficient transitions occur on the tree
-  good.sim <- F
-  rate <- .3
-  while(good.sim == F){
-    disc.trait <- sim.char(phy = alt.tree,
-                           par = matrix(c(-rate, rate, rate, -rate), 2),
-                           model = 'discrete',
-                           root = sample(c(1,2),1))
-    if((0.05 * 100) < sum(disc.trait == min(disc.trait)) &&
-       sum(disc.trait == min(disc.trait)) < (.95 * 100)){
-      good.sim <- T
-    }
-  }
-  # we now apply the AncCond test to our simulated data and record its result
-  data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-
-
-
-
-
-
-
-
-
-
-
-  ##### create named vector for disc trait for all taxa #####
-  dt.vec <- data[, 3]
-  names(dt.vec) <- data[, 1]
-    ct.data <- data
-    ct.vec <- as.numeric(ct.data[, 2])
-    names(ct.vec) <- ct.data[, 1]
-  ## ASR for the continuous trait
-  anc.states.cont.trait <- cont.trait.AC
-
-  ## ASR for discrete trait
-  ## using stochastic mappings to nail down specific transition points
-  anc.state.dt <- make.simmap(tree, dt.vec,
-                              model = matrix(c(0,2,1,0), 2),
-                              nsim = 1,
-                              pi = "estimated",
-                              message = F)
-
-
-
+}
+# we now apply the AncCond test to our simulated data and record its result
+data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
+##### create named vector for disc trait for all taxa #####
+dt.vec <- data[, 3]
+names(dt.vec) <- data[, 1]
+ct.data <- data
+ct.vec <- as.numeric(ct.data[, 2])
+names(ct.vec) <- ct.data[, 1]
+## ASR for the continuous trait
+anc.states.cont.trait <- cont.trait.AC
+## ASR for discrete trait
+## using stochastic mappings to nail down specific transition points
+anc.state.dt <- make.simmap(tree, dt.vec,
+                            model = matrix(c(0,2,1,0), 2),
+                            nsim = 1,
+                            pi = "estimated",
+                            message = F)
 iter <- 100
 mat <- c(0,2,1,0)
 
 
-rm(list=ls()[-c(2,3,22,14,17)])
+rm(list=ls()[-c(2,3,22,14,17)]) 
+######
+
+
+
+
+
+
 
 CreateNull <- function(tree,                     # a tree type phylo
                        iter,                     # number of simulations for null
@@ -150,14 +142,14 @@ CreateNull <- function(tree,                     # a tree type phylo
                                 nsim = 1,
                                 pi = pi,
                                 message = F)
-
+    
     ## Parse simmap to get producing nodes
     # the mapped edge object has time spent in a state in
     # two columns so only branches with a change have an entry
     # in both columns
     ss_nodes <- anc.state.dt$mapped.edge[, 1] > 0 &
       anc.state.dt$mapped.edge[, 2] > 0
-
+    
     # this returns the node pairs describing a branch with origins
     wanted_branches <- ss_nodes[ss_nodes == T]
     wanted_nodes <- names(wanted_branches)
