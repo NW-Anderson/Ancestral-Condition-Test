@@ -15,7 +15,7 @@ cont.trait <- sim.char(tree, 0.2, model = 'BM')[,,1]
 # identifying which branch had a mean cont trait value in the upper and lower quartiles
 # we do this by 1st doing an ASR for the continious trait
 cont.trait.AC <- anc.ML(tree, cont.trait, model = "BM")
-# this will hold all of the branch means in the same order they are given in trees
+# this will hold all of the branch means in the same order they are given in tree
 branch.means <- c()
 # branch names is essentially paste(rootward node, tipward node)
 branch.names <- c()
@@ -51,7 +51,7 @@ lower <- summary(branch.means)[[2]]
 # next we perform the following analysis on this tree for each of the scaling factors
 
 scale.factor <- 5
-# we leave the original trees un altered
+# we leave the original tree un altered
 alt.tree <- tree
 
 # we then manipulate the branch lengths of those branches whose cont trait means are in the upper or lower quartiles
@@ -84,9 +84,7 @@ n.tails <- 1
 message <- T
 
 
-rm(list=ls()[-c(21,6,13,8,12,18,15,14)])  
-trees <- tree
-rm(tree)
+rm(list=ls()[-c(21,6,13,8,12,18,15,14)])
 ###############################
 
 ##################################################################
@@ -98,7 +96,7 @@ rm(tree)
 ##################################################################
 ##
 ## INPUT DATA
-## trees: a phylo object
+## tree: a phylo object
 ## - for multiphylo analysis. Loop through every tree and compile the the
 ##   of each loop to create a distribution of observed values and a multiphylo
 ##   null distribution
@@ -133,30 +131,40 @@ rm(tree)
 
 
 
-AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi="equal", n.tails = 1, message = T) {
+AncCond <- function(tree,
+                    data,
+                    mc = 1000,
+                    drop.state=NULL,
+                    mat=c(0,2,1,0),
+                    pi="equal",
+                    n.tails = 1,
+                    message = T) {
   ##### testing inputs #####
-  if(class(trees) != 'phylo') {stop('trees must be class phylo')}
+
+  # TODO SUBFUNCTION THIS TESTING STUFF
+
+  if(class(tree) != 'phylo') {stop('tree must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
   if(class(mc) != 'numeric' | round(mc) != mc | mc < 1){stop('mc should be a numeric positive integer integer')}
   if(!is.null(drop.state)) if(!drop.state %in% c(1,2)){stop('drop.state must be NULL, or numeric 1 or 2')}
   if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
     stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
   }
-  
+
   if((!pi %in% c('equal', 'estimated'))[1]){
     if(!is.numeric(pi)) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
     if(length(pi) != 2 | sum(pi) != 1) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
   }
-  
+
   if(n.tails != 1 & n.tails != 2){stop('n.tails should be numeric 1 or 2')}
   #####
   #####
-  
+
   ##### create named vector for disc trait for all taxa #####
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
-  
-  
+
+
   ##### create named vector for cont trait taxa not in derived state #####
   if(!is.null(drop.state)){
     ct.data <- data[(data[, 3] != drop.state),]
@@ -171,80 +179,93 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
     stop('There exists missing trait data for some species in the phylogeny.\n
          Please remove such taxa from the tree.')
   }
-  
+
   #### ASR for the continuous trait  ####
-  anc.states.cont.trait <- anc.ML(trees, ct.vec, model = "BM")
-  
+  anc.states.cont.trait <- anc.ML(tree, ct.vec, model = "BM")
+
   #### Stochastic map for discrete trait  ####
   ## using stochastic mappings to nail down specific transition points
   ### TODO convert to q=MCMC to take into account uncertainty in rates of
   ### evolution for discrete trait like 100 for nsim
-  # anc.state.dt <- make.simmap(trees, dt.vec,
+  # anc.state.dt <- make.simmap(tree, dt.vec,
   #                             model = matrix(mat, 2),
   #                             nsim = 1,
   #                             pi = pi,
   #                             message = F)
-  
-  
-  anc.state.dt <- make.simmap(trees, dt.vec, 
+
+
+  anc.state.dt <- make.simmap(tree, dt.vec,
                               model = matrix(mat,2),
                               nsim = 100,
                               pi = pi,
                               Q = 'mcmc',
                               message = T)
-  
+
   observed.anc.cond <- list()
   null.anc.cond <- list()
   for(j in 1:100){
-    current.map <-  anc.state.dt[[j]]
-    #### Parse simmap to get producing nodes ####
-    # the mapped edge object has time spent in a state in
-    # two columns so only branches with a change have an entry
-    # in both columns
-    ss_nodes <- current.map$mapped.edge[, 1] > 0 &
-      current.map$mapped.edge[, 2] > 0
-    
-    # this returns the node pairs describing a branch with origins
-    wanted_branches <- ss_nodes[ss_nodes == T]
-    wanted_nodes <- names(wanted_branches)
-    if(sum(mat) > 1){
-      # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
-      producing.nodes12 <- c()
-      producing.nodes21 <-c()
-      trans.maps <- current.map$maps[ss_nodes == T]
-      # now we take the rootward node of each branch and get rid of duplicates
-      wanted_nodes <- gsub(",.*", "", wanted_nodes)
-      ##### Just realized we can do this with describe.simmap :(
-      ##### But i dont want to change it, it would require match function
-      for(i in 1:length(wanted_nodes)){
-        if(names(trans.maps[[i]])[1] == '1'){
-          producing.nodes12 <- c(producing.nodes12, wanted_nodes[i])
-        }else if(names(trans.maps[[i]])[1] == '2'){
-          producing.nodes21 <- c(producing.nodes21, wanted_nodes[i])
-        }
-      }
-      
-      producing.nodes12 <- unique(producing.nodes12)
-      producing.nodes21 <- unique(producing.nodes21)
-      
-      
-      ##### get estimated ancestral conditions ######
-      observed.anc.cond[[j]] <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                                        producing.nodes12],
-                                     '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                                        producing.nodes21])
-      null.anc.cond[[j]] <- CreateNull(tree = trees,                     # a tree type phylo
+
+    observed.anc.cond[[j]] <- exctractAncestral(current.map = anc.state.dt[[j]],
+                                                anc.states.cont.trait)
+    #######
+    # current.map <-  anc.state.dt[[j]]
+    # #### Parse simmap to get producing nodes ####
+    # # the mapped edge object has time spent in a state in
+    # # two columns so only branches with a change have an entry
+    # # in both columns
+    # #######
+    # # gets branches with transitions
+    # ss_nodes <- current.map$mapped.edge[, 1] > 0 &
+    #   current.map$mapped.edge[, 2] > 0
+    #
+    # # this returns the node pairs describing a branch with transitions
+    # wanted_branches <- ss_nodes[ss_nodes == T]
+    # wanted_nodes <- names(wanted_branches)
+    #
+    #
+    # if(sum(mat) > 1){
+    #   # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
+    #   producing.nodes12 <- c()
+    #   producing.nodes21 <-c()
+    #   trans.maps <- current.map$maps[ss_nodes == T]
+    #   # now we take the rootward node of each branch and get rid of duplicates
+    #   wanted_nodes <- gsub(",.*", "", wanted_nodes)
+    #   ##### Just realized we can do this with describe.simmap :(
+    #   ##### But i dont want to change it, it would require match function
+    #   for(i in 1:length(wanted_nodes)){
+    #     if(names(trans.maps[[i]])[1] == '1'){
+    #       producing.nodes12 <- c(producing.nodes12, wanted_nodes[i])
+    #     }else if(names(trans.maps[[i]])[1] == '2'){
+    #       producing.nodes21 <- c(producing.nodes21, wanted_nodes[i])
+    #     }
+    #   }
+    #
+    #   producing.nodes12 <- unique(producing.nodes12)
+    #   producing.nodes21 <- unique(producing.nodes21)
+    #
+    #
+    #   ##### get estimated ancestral conditions ######
+    #   observed.anc.cond[[j]] <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
+    #                                                                     producing.nodes12],
+    #                                  '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
+    #                                                                     producing.nodes21])
+    ########
+
+  # creating the null
+      null.anc.cond[[j]] <- CreateNull(tree = tree,                     # a tree type phylo
                                        iter = 10,                        # number of simulations for null
-                                       anc.state.dt = current.map,       # for Q-matrix
-                                       mat = mat,                        # model specification matrix
+                                       current.map = anc.state.dt[[j]],       # for Q-matrix
                                        anc.states.cont.trait = anc.states.cont.trait)    # ancestral state reconstruction for continuous
-      
-      
-      
-      
+
+
+  }
+  # TODO return both lists or process them here and return results
+}
+
+
       ##### DEPRECIEATED ######
       # ## get the mean ancestral value for the cont trait
-      # ## at nodes producing the derived state marginalizing across trees
+      # ## at nodes producing the derived state marginalizing across tree
       # orig.val12 <- mean(anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
       #                                                producing.nodes12])
       # orig.val21 <- mean(anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
@@ -272,7 +293,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       # }
       # ## how many more extreme
       ###### DEPRECIATED ######
-      
+
       ###### MOVED TO END #####
       # bigger12 <- (sum(null.orig.val12 >= orig.val12) / mc)
       # smaller12 <- (sum(null.orig.val12 <= orig.val12) / mc)
@@ -283,7 +304,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       # }else{
       #   pval12 <- NA
       # }
-      # 
+      #
       # bigger21 <- (sum(null.orig.val21 >= orig.val21) / mc)
       # smaller21 <- (sum(null.orig.val21 <= orig.val21) / mc)
       # if(!is.null(producing.nodes21)){
@@ -293,7 +314,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       # }else{
       #   pval21 <- NA
       # }
-      # 
+      #
       # ## print results to terminal
       # if (message == T){
       #   cat(paste(
@@ -316,13 +337,13 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       #                                              digits = 4), "\n"))
       #   cat(paste("SD of null dist 1->2:", round(sd(null.orig.val12), digits = 4), "\n"))
       #   cat(paste("SD of null dist 2->1:", round(sd(null.orig.val21), digits = 4), "\n"))
-      #   
+      #
       #   cat(paste("pvalue 1->2:", round(pval12, digits = 4), "\n"))
       #   cat(paste("pvalue 2->1:", round(pval21, digits = 4), "\n\n"))
       #   if(is.null(producing.nodes12)){cat('No 1 -> 2 transitions occured NA and NaN values produced.')}
       #   if(is.null(producing.nodes21)){cat('No 2 -> 1 transitions occured NA and NaN values produced.')}
       # }
-      # 
+      #
       # ## return results to user
       # results <- list()
       # results[[1]] <- orig.val12
@@ -342,19 +363,19 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       wanted_nodes <- gsub(",.*", "", wanted_nodes)
       producing.nodes <- unique(wanted_nodes)
       ## get the mean ancestral value for the cont trait
-      ## at nodes producing the derived state marginalizing across trees
+      ## at nodes producing the derived state marginalizing across tree
       observed.anc.cond[[j]] <-  list(anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
                                                        producing.nodes])
-      null.anc.cond[[j]] <- CreateNull(tree = trees,                     # a tree type phylo
+      null.anc.cond[[j]] <- CreateNull(tree = tree,                     # a tree type phylo
                                        iter = 10,                        # number of simulations for null
                                        anc.state.dt = current.map,       # for Q-matrix
                                        mat = mat,                        # model specification matrix
                                        anc.states.cont.trait = anc.states.cont.trait)    # ancestral state reconstruction for continuous
-      ##### DEPRECIATED #####
+      ##### DEPRECATED #####
       # anc.states <- anc.states.cont.trait
       # orig.val <- mean(anc.states$ace[names(anc.states$ace) %in%
       #                                   producing.nodes])
-      # 
+      #
       # ## Produce the null distribution of nodes in ancestral cond
       # null.orig.val <- vector(length = mc)
       # number.of.trans <- length(producing.nodes)
@@ -363,17 +384,17 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       # node.states <- describe.simmap(anc.dt)$states
       # anc.cond.nodes <- anc.ct$ace[names(anc.ct$ace) %in%
       #                                names(node.states)[node.states != '2']]
-      # 
+      #
       # for (j in 1:mc){
       #   # set.seed(j)
       #   null.orig.val[j] <- mean(sample(anc.cond.nodes,
       #                                   length(producing.nodes)))
       # }
       ##### DEPRECIATED ######
-      
+
       ##### MOVED TO END #####
       # ## how many more extreme
-      # 
+      #
       # bigger <- (sum(null.orig.val >= orig.val) / mc)
       # smaller <- (sum(null.orig.val <= orig.val) / mc)
       # if (bigger <= smaller){pval <- bigger}
@@ -392,10 +413,10 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
       #   cat(paste("Mean of null dist:", round(mean(null.orig.val),
       #                                         digits = 4), "\n"))
       #   cat(paste("SD of null dist:", round(sd(null.orig.val), digits = 4), "\n"))
-      #   
+      #
       #   cat(paste("pvalue:", round(pval, digits = 4), "\n\n"))
       # }
-      # 
+      #
       # ## return results to user
       # results <- list()
       # results[[1]] <- orig.val
@@ -417,7 +438,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   # }else{
   #   pval12 <- NA
   # }
-  # 
+  #
   # bigger21 <- (sum(null.orig.val21 >= orig.val21) / mc)
   # smaller21 <- (sum(null.orig.val21 <= orig.val21) / mc)
   # if(!is.null(producing.nodes21)){
@@ -427,7 +448,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   # }else{
   #   pval21 <- NA
   # }
-  # 
+  #
   # ## print results to terminal
   # if (message == T){
   #   cat(paste(
@@ -450,13 +471,13 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   #                                              digits = 4), "\n"))
   #   cat(paste("SD of null dist 1->2:", round(sd(null.orig.val12), digits = 4), "\n"))
   #   cat(paste("SD of null dist 2->1:", round(sd(null.orig.val21), digits = 4), "\n"))
-  #   
+  #
   #   cat(paste("pvalue 1->2:", round(pval12, digits = 4), "\n"))
   #   cat(paste("pvalue 2->1:", round(pval21, digits = 4), "\n\n"))
   #   if(is.null(producing.nodes12)){cat('No 1 -> 2 transitions occured NA and NaN values produced.')}
   #   if(is.null(producing.nodes21)){cat('No 2 -> 1 transitions occured NA and NaN values produced.')}
   # }
-  # 
+  #
   # ## return results to user
   # results <- list()
   # results[[1]] <- orig.val12
@@ -473,7 +494,7 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   ##### MOVED TO END #####
   ##### MOVED TO END #####
   # ## how many more extreme
-  # 
+  #
   # bigger <- (sum(null.orig.val >= orig.val) / mc)
   # smaller <- (sum(null.orig.val <= orig.val) / mc)
   # if (bigger <= smaller){pval <- bigger}
@@ -492,10 +513,10 @@ AncCond <- function(trees, data, mc = 1000, drop.state=NULL, mat=c(0,2,1,0), pi=
   #   cat(paste("Mean of null dist:", round(mean(null.orig.val),
   #                                         digits = 4), "\n"))
   #   cat(paste("SD of null dist:", round(sd(null.orig.val), digits = 4), "\n"))
-  #   
+  #
   #   cat(paste("pvalue:", round(pval, digits = 4), "\n\n"))
   # }
-  # 
+  #
   # ## return results to user
   # results <- list()
   # results[[1]] <- orig.val
