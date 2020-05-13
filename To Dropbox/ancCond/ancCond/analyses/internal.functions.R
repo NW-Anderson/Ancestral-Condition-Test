@@ -8,6 +8,7 @@ InputTesting <- function(tree,
                          pi,
                          n.tails,
                          nsim,
+                         iter){
   ##### testing inputs #####
 
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
