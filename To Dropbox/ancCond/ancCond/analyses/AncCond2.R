@@ -1,4 +1,3 @@
-source('internal.functions.R')
 ###############################
 
 ##################################################################
@@ -44,6 +43,7 @@ source('internal.functions.R')
 
 
 
+source('internal.functions.R')
 
 AncCond <- function(tree,
                     data,
@@ -53,10 +53,9 @@ AncCond <- function(tree,
                     n.tails = 1,
                     nsim = 100,
                     iter = 100,
-                    message = F,
-                    make.plot = F){
-  
-  
+                    message = F){
+
+
   # This will generate warnings and stop if we violate
   # any basic assumptions on incoming data
   InputTesting(tree,
@@ -73,54 +72,56 @@ AncCond <- function(tree,
   dt.vec <- unpackeddata[[1]]
   ct.vec <- unpackeddata[[2]]
   rm(unpackeddata)
-  
+
   # ASR for the continuous trait
   anc.states.cont.trait <- anc.ML(tree, ct.vec, model = "BM")
-  
+
   # Stochastic map for discrete trait using stochastic mappings to nail
   # down specific transition points
+  if(message) cat('Simulating stochastic mappings:\n')
   anc.state.dt <- make.simmap(tree, dt.vec,
                               model = matrix(mat,2),
-                              nsim = as.numeric(nsim),
+                              nsim = nsim,
                               pi = pi,
                               Q = 'mcmc',
                               message = message)
-  
+
   # processing our stoch maps to extract the ancestral condition and
   # construct the null
   observed.anc.cond <- list()
   null.anc.cond <- list()
+  meantrans <- vector(length = 2)
+  names(meantrans) <- c('12','21')
   for(j in 1:nsim){
     if(message){
       cat('\014')
       cat('Analyzing map: ',j,' of ', nsim)
     }
     observed.anc.cond[[j]] <- exctractAncestral(current.map = anc.state.dt[[j]],
-                                                anc.states.cont.trait)
-    
+                                                anc.states.cont.trait, count = T)
+    meantrans[1] <- meantrans[1] + observed.anc.cond[[j]]$ntrans[1]
+    meantrans[2] <- meantrans[2] + observed.anc.cond[[j]]$ntrans[2]
+    observed.anc.cond[[j]]$ntrans <- NULL
+
     # creating the null
-    current.Q <- anc.state.dt[[j]]$Q
-    current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
     null.anc.cond[[j]] <- CreateNull(tree = tree,
                                      iter = iter,
-                                     current.Q = current.Q,
+                                     current.map = anc.state.dt[[j]],
                                      anc.states.cont.trait = anc.states.cont.trait)
   }
-  
+  meantrans <- meantrans / nsim
   obs.dist <- ProcessObserved(observed.anc.cond)
-  null.dist <- ProcessNull(null.anc.cond)
-  
+  null.dist <- ProcessNull(null.anc.cond, iter)
+
   results <- list(obs.dist, null.dist)
   names(results) <- c("observed","null")
-  pvals <- CalcPVal(results)
-  
-  results <- list(obs.dist, null.dist,pvals)
-  names(results) <- c("observed","null",'pvals')
+  pvals <- CalcPVal(results, n.tails)
+
+  results <- list(obs.dist, null.dist,pvals, meantrans)
+  names(results) <- c("observed","null",'pvals', 'mean n trans')
   class(results) <- "AncCond"
-  
+
   if(message) summary(results)
-  if(make.plot) plot(results)
-  
   return(results)
 }
 

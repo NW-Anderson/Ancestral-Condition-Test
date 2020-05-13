@@ -1,10 +1,10 @@
-##### CreatingTesting Data #####
+
 ##### Bidirectional #####
 library(phytools)
 library(geiger)
 library(diversitree)
 ntaxa <- 200
-scale.factor <- 2
+scale.factor <- 8
 rate <- .6
 
 tree <- trees(pars = c(3,1),
@@ -80,8 +80,8 @@ while(good.sim == F){
 # we now apply the AncCond test to our simulated data and record its result
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
-nsim <- 51
-iter <- 112
+nsim <- 25
+iter <- 100
 drop.state <- NULL
 mat <- c(0,2,1,0)
 pi <- 'estimated'
@@ -182,3 +182,17 @@ make.plot <- T
 
 
 rm(list=ls()[-c(24,6,8,14,21,16,18,10,15,14,13)])
+
+##### running #####
+source('AncCond2.R')
+testing <-  AncCond(tree,
+                    data,
+                    drop.state,
+                    mat,
+                    pi,
+                    n.tails,
+                    nsim,
+                    iter,
+                    message)
+ 
+plot(testing)
