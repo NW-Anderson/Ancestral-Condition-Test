@@ -74,6 +74,7 @@ AncCond <- function(tree,
   rm(unpackeddata)
 
   # ASR for the continuous trait
+  if(message) cat("Estimating ancestral states for the continuous trait\n")
   anc.states.cont.trait <- anc.ML(tree, ct.vec, model = "BM")
 
   # Stochastic map for discrete trait using stochastic mappings to nail
