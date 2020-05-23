@@ -226,7 +226,6 @@ CalcPVal <- function(results,n.tails){
 
 summary.AncCond <- function(results){
   ## print results to terminal
-  cat('\014')
   cat(paste(
     "Mean value for the continuous trait at 1 - > 2 transitions:",
     round(results$observed[1], digits = 4),
@@ -260,3 +259,4 @@ summary.AncCond <- function(results){
     cat('NA and NaN values are produced when no transitions of a type have occured. \n\n')
   }
 }
+
