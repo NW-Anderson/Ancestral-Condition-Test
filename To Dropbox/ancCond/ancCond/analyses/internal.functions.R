@@ -188,7 +188,6 @@ plot.AncCond <- function(results){
          ylab = 'Frequency')
     abline(v=results$observed[1], col = 'red')
     legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
-    if(!is.na(results$pvals[2])) wait()
   }
   if(!is.na(results$pvals[2])){
     plot(density(results$null$`21`, na.rm = T),
@@ -226,6 +225,7 @@ CalcPVal <- function(results,n.tails){
 
 summary.AncCond <- function(results){
   ## print results to terminal
+  cat('\n')
   cat(paste(
     "Mean value for the continuous trait at 1 - > 2 transitions:",
     round(results$observed[1], digits = 4),

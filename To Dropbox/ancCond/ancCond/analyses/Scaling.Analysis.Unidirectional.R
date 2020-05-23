@@ -7,22 +7,24 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+#cl<-makeCluster(3, type="SOCK")
+#on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoSNOW(3)
 
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE) 
+source('AncCond2.R', local = TRUE) 
+scaling.factors <- c(1,2,5,8,10)
+rate <- .2
 
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
 # dont need this for mc
-p.val.array <- array(dim = c(n.trees, 10))
+p.val.array <- array(dim = c(n.trees, 5))
 
 
 
@@ -82,7 +84,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         lower <- summary(branch.means)[[2]]
                         
                         # next we perform the following analysis on this tree for each of the scaling factors
-                        for(s in 1:10){
+                        for(s in scaling.factors){
                           scale.factor <- s
                           # we leave the original trees un altered 
                           alt.tree <- trees 
@@ -95,7 +97,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           # next we simulated a discrete trait on this altered tree
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
-                          rate <- .1
+                          
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree,
                                                    par = matrix(c(-rate, 0, rate, 0), 2),
@@ -109,12 +111,12 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           if(message == T){cat('\n')}
                           # we now apply the AncCond test to our simulated data and record its result
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-                          rslt <- AncCond(trees = trees, 
+                          rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           drop.state = 2, 
                                           mat = c(0,0,1,0), 
                                           pi = c(1,0), 
-                                          message = F)
+                                          message = T)
                           p.val.vec[s] <- rslt$pval
                           if(message == T){cat(' s = ', s)}
                         }

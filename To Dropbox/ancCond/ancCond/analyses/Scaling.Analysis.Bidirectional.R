@@ -15,7 +15,9 @@ registerDoSNOW(cl)
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE)
+source('AncCond2.R', local = TRUE)
+scaling.factors <- c(1,2,5,8,1)
+rate <- .6
 
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
@@ -78,7 +80,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         
                         # next we perform the following analysis on this tree for each of the scaling factors
                         
-                        for(s in 1:10){
+                        for(s in scaling.factors){
                           scale.factor <- s
                           # we leave the original trees un altered 
                           alt.tree <- trees 
@@ -91,7 +93,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           # next we simulated a discrete trait on this altered tree
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
-                          rate <- .3
+                          
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
                                                    par = matrix(c(-rate, rate, rate, -rate), 2), 
@@ -105,10 +107,10 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           if(message == T){cat('\n')}
                           # we now apply the AncCond test to our simulated data and record its result
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-                          rslt <- AncCond(trees = trees, 
+                          rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           message = T)
-                          p.val.vec[s] <- paste(rslt$`pval1->2`,rslt$`pval2->1`,sep = ',')
+                          p.val.vec[s] <- paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ',')
                           if(message == T){cat(' s = ', s)}
                         }
                         if(message == T){cat('\n')}
