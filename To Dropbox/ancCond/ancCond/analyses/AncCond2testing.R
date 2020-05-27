@@ -142,8 +142,8 @@ AncCond <- function(tree,
   
   obs.dist3 <- ProcessObservedNoMean(observed.anc.cond)
   null.dist3 <- ProcessNullNoMean(null.anc.cond,iter)
-  plot(density(null.dist3$`12`, na.rm = T),
-       main = ' Mean',
+  plot(hist(null.dist3$`12`, na.rm = T),
+       main = 'No Mean',
        xlim= c(min(c(null.dist3$`12`,
                      obs.dist3$`12`)),
                max(c(null.dist3$`12`,
@@ -163,5 +163,9 @@ AncCond <- function(tree,
 
   if(message) summary(results)
   return(results)
+  
+  sim.anc.state.dt <- sim.history(tree=tree, Q=anc.state.dt[[1]]$Q,
+                                  nsim=1, message = F,
+                                  anc = 1)
 }
 

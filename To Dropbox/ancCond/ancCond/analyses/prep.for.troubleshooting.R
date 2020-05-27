@@ -96,8 +96,8 @@ library(phytools)
 library(geiger)
 library(diversitree)
 ntaxa <- 200
-scale.factor <- 10
-rate <- .1
+scale.factor <- 1
+rate <- .2
 tree <- trees(pars = c(3,1),
               type = "bd",
               n = 1,

@@ -56,6 +56,9 @@ CreateNull <- function(tree,                     # a tree type phylo
       sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                       nsim=1, message = F,
                                       anc = root.state)
+      ##### TODO make realistic constraint
+      ##### number of transitions must match the emperical
+      ##### inlcude timeout model adequacy printout
       if(length(unique(sim.anc.state.dt$states))>1){
         #      sim.anc.state.dt$mapped.edge[sim.anc.state.dt$mapped.edge == 0] <- NA
         #      if(sum(complete.cases(sim.anc.state.dt$mapped.edge)) >= 1){
