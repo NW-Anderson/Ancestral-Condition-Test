@@ -14,12 +14,13 @@ registerDoSNOW(cl)
 
 n.trees <- 100
 scale.factor <- 1
-n.taxa <- seq(20, 200, length.out = 10)
+n.taxa <- c(20,50,100,150,200)
 message <- T
-source('AncCond.R', local = TRUE)
+source('AncCond2.R', local = TRUE)
+rate <- .2
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes
- p.val.array <- array(dim = c(n.trees, 10))
+ p.val.array <- array(dim = c(n.trees,5))
 
 # this time we vary the size of the tree
 
@@ -92,7 +93,6 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
                           # count <- 0
-                          rate <- .1
                           # withTimeout({
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
@@ -107,19 +107,22 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           if(message == T){cat('\n')}
                           # we now apply the AncCond test to our simulated data and record its result
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-                          rslt <- AncCond(trees = trees, 
-                                          data = dat, 
-                                          drop.state = 2, 
+                          rslt <- AncCond(tree = tree, 
+                                          data = data, 
                                           mat = c(0,0,1,0), 
+                                          drop.state = drop.state,
                                           pi = c(1,0), 
-                                          message = F)
+                                          nsim = nsim,
+                                          iter = iter,
+                                          n.tails = n.tails,
+                                          message = T)
                           
                           if(message == T){cat('\n')}
                           if(message == T){
                             cat('\n')
                             cat(' t = ', t)
                           }
-                          p.val.vec[t] <- rslt$pval
+                          p.val.vec[t] <- rslt$pvals[1]
                         }
                         if(message == T){
                           cat('\n')

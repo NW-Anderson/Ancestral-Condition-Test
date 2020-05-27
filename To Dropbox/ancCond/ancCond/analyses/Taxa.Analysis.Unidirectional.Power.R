@@ -20,6 +20,7 @@ scale.factor <- 5
 n.taxa <- seq(20, 200, length.out = 10)
 message <- T
 source('AncCond.R', local = TRUE)
+rate <- .2
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes
 p.val.array <- array(dim = c(n.trees, 10))
@@ -94,7 +95,6 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           # next we simulated a discrete trait on this altered tree
                           # while loop is set up to make sure sufficient transitions occur on the tree
                           good.sim <- F
-                          rate <- .1
                           while(good.sim == F){
                             disc.trait <- sim.char(phy = alt.tree, 
                                                    par = matrix(c(-rate, 0, rate, 0), 2), 
@@ -108,19 +108,19 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           if(message == T){cat('\n')}
                           # we now apply the AncCond test to our simulated data and record its result
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-                          rslt <- AncCond(trees = trees, 
+                          rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           drop.state = 2, 
                                           mat = c(0,0,1,0), 
                                           pi = c(1,0), 
-                                          message = F)
+                                          message = T)
                           
                           if(message == T){cat('\n')}
                           if(message == T){
                             cat('\n')
                             cat(' t = ', t)
                           }
-                          p.val.vec[t] <- rslt$pval
+                          p.val.vec[t] <- rslt$pvals[1]
                         }
                         if(message == T){
                           cat('\n')

@@ -69,7 +69,7 @@ n.taxa <- 200
 message <- T
 source('AncCond2.R', local = TRUE)
 
-pval.array <- p.val.array <- array(dim = c(n.trees, 2))
+pval.array <- p.val.array <- array(dim = c(n.trees, 3))
 
 
 for(t in 1:n.trees){
@@ -126,7 +126,15 @@ for(t in 1:n.trees){
   thresh2 <- HPDinterval(thresh1)
   if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
   if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
-  results <- c((pagel < 0.05), thresh3)
+  
+  dat <- data.frame(tree$tip.label, cont.trait, disc.trait)
+  anccond <- AncCond(tree = trees, 
+                  data = dat, 
+                  drop.state = 2, 
+                  mat = c(0,0,1,0), 
+                  pi = c(1,0), 
+                  message = T)$pval
+  results <- c((pagel < 0.05), thresh3, anccond)
   
   results
   pval.array[t,] <- results
