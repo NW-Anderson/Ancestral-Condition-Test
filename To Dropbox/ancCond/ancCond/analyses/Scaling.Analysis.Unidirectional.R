@@ -12,7 +12,7 @@ library(foreach)
 #cl<-makeCluster(3, type="SOCK")
 #on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(3)
+registerDoMC(3)
 
 n.trees <- 100
 n.taxa <- 200
