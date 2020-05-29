@@ -5,7 +5,7 @@ library(geiger)
 library(diversitree)
 ntaxa <- 200
 scale.factor <- 8
-rate <- .3
+rate <- .6
 
 tree <- trees(pars = c(3,1),
               type = "bd",
@@ -171,7 +171,7 @@ while(good.sim == F){
 # we now apply the AncCond test to our simulated data and record its result
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
-drop.state = 2
+drop.state = NULL
 mat = c(0,0,1,0)
 pi = c(1,0)
 nsim <- 100

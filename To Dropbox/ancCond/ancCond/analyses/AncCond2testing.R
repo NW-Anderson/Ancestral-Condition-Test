@@ -108,7 +108,9 @@ AncCond <- function(tree,
     null.anc.cond[[j]] <- CreateNull(tree = tree,
                                      iter = iter,
                                      current.map = anc.state.dt[[j]],
-                                     anc.states.cont.trait = anc.states.cont.trait)
+                                     anc.states.cont.trait = anc.states.cont.trait,
+                                     dt.vec = dt.vec,
+                                     message = message)
   }
   meantrans <- meantrans / nsim
   # mean of means

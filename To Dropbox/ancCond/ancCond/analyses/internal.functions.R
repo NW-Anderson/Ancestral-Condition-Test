@@ -10,7 +10,7 @@ InputTesting <- function(tree,
                          nsim,
                          iter){
   ##### testing inputs #####
-
+  
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
   if(!is.null(drop.state)) if(!drop.state %in% c(1,2)){stop('drop.state must be NULL, or numeric 1 or 2')}
@@ -37,12 +37,14 @@ quiet <- function(x) {
 CreateNull <- function(tree,                     # a tree type phylo
                        iter,                     # number of simulations for null
                        current.map,             # for Q-matrix
-                       anc.states.cont.trait){   # ancestral state reconstruction for continuous
+                       anc.states.cont.trait,   # ancestral state reconstruction for continuous
+                       dt.vec,
+                       message){   
   current.Q <- current.map$Q
   if(sum(current.Q == 0)>0){
-     current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
-     cat('\n')
-     print("Your estimated transition matrix has a rate of zero for some parameters these are being set to 10e-25 for simulation purposes")
+    current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
+    cat('\n')
+    print("Your estimated transition matrix has a rate of zero for some parameters these are being set to 10e-25 for simulation purposes")
   }
   root.state <- c(0,0)
   names(root.state) <- 1:2
@@ -52,18 +54,20 @@ CreateNull <- function(tree,                     # a tree type phylo
     # while loop is set up to make sure sufficient transitions occur on the tree
     good.sim <- F
     while(good.sim == F){
-
       sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                       nsim=1, message = F,
                                       anc = root.state)
-      ##### TODO make realistic constraint
-      ##### number of transitions must match the emperical
-      ##### inlcude timeout model adequacy printout
-      if(length(unique(sim.anc.state.dt$states))>1){
-        #      sim.anc.state.dt$mapped.edge[sim.anc.state.dt$mapped.edge == 0] <- NA
-        #      if(sum(complete.cases(sim.anc.state.dt$mapped.edge)) >= 1){
+      if(table(getStates(sim.anc.state.dt, type = 'tips'))[1] >= .9 * table(dt.vec)[1] &&
+         table(getStates(sim.anc.state.dt, type = 'tips'))[1] <= 1.1 * table(dt.vec)[1]){
         good.sim <- T
-        #     }
+        if(message){
+          cat('\014')
+          cat('Number of transitions:\n')
+          cat(' Emperical Map:\n')
+          CountTrans(current.map)
+          cat('\n Null Simulation:\n')
+          CountTrans(sim.anc.state.dt)
+        }
       }
     }
     nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
@@ -86,11 +90,11 @@ exctractAncestral <- function(current.map,
   # gets branches with transitions
   ss_nodes <- current.map$mapped.edge[, 1] > 0 &
     current.map$mapped.edge[, 2] > 0
-
+  
   # this returns the node pairs describing a branch with transitions
   wanted_branches <- ss_nodes[ss_nodes == T]
   wanted_nodes <- names(wanted_branches)
-
+  
   # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
   producing.nodes12 <- c()
   producing.nodes21 <-c()
@@ -110,20 +114,20 @@ exctractAncestral <- function(current.map,
   names(ntrans) <- c('12','21')
   producing.nodes12 <- unique(producing.nodes12)
   producing.nodes21 <- unique(producing.nodes21)
-
-
+  
+  
   ##### get estimated ancestral conditions ######
   if(count == T){
-  observed.anc.cond <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                               producing.nodes12],
-                            '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                               producing.nodes21],
-                            'ntrans' = ntrans)
+    observed.anc.cond <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
+                                                                 producing.nodes12],
+                              '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
+                                                                 producing.nodes21],
+                              'ntrans' = ntrans)
   }else{
     observed.anc.cond <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                                     producing.nodes12],
-                                  '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
-                                                                     producing.nodes21])}
+                                                                 producing.nodes12],
+                              '21' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
+                                                                 producing.nodes21])}
   return(observed.anc.cond)
 }
 
@@ -133,8 +137,8 @@ UnpackData <- function(data, drop.state){
   ##### create named vector for disc trait for all taxa #####
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
-
-
+  
+  
   ##### create named vector for cont trait taxa not in derived state #####
   if(!is.null(drop.state)){
     ct.data <- data[(data[, 3] != drop.state),]
@@ -305,15 +309,21 @@ summary.AncCond <- function(results){
                                              digits = 4), "\n\n"))
   cat(paste("SD of null dist 1->2:", round(sd(results$null$`12`, na.rm = T), digits = 4), "\n"))
   cat(paste("SD of null dist 2->1:", round(sd(results$null$`21`, na.rm = T), digits = 4), "\n\n"))
-
+  
   cat(paste("pvalue 1->2:", round(results$pvals[1], digits = 4), "\n"))
   cat(paste("pvalue 2->1:", round(results$pvals[2], digits = 4), "\n\n\n"))
-
+  
   if(is.na(results$pvals[1])){
     cat('NA and NaN values are produced when no transitions of a type have occured. \n\n')
   }
   if(is.na(results$pvals[2])){
     cat('NA and NaN values are produced when no transitions of a type have occured. \n\n')
   }
+}
+
+CountTrans <- function(current.map){
+  ntrans <- sum(current.map$mapped.edge[, 1] > 0 &
+                  current.map$mapped.edge[, 2] > 0)
+  cat(ntrans)
 }
 
