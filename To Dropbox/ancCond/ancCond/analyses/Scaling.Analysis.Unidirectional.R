@@ -18,7 +18,7 @@ n.trees <- 100
 n.taxa <- 200
 message <- T
 source('AncCond2.R', local = TRUE) 
-scaling.factors <- c(1,5)
+scaling.factors <- c(1)
 rate <- .2
 
 # we do the following for each of 200 trees

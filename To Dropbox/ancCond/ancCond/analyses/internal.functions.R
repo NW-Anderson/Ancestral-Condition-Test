@@ -53,7 +53,9 @@ CreateNull <- function(tree,                     # a tree type phylo
   for(n in 1:iter){
     # while loop is set up to make sure sufficient transitions occur on the tree
     good.sim <- F
+    sim.count <- 0
     while(good.sim == F){
+      sim.count <- sim.count + 1
       sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                       nsim=1, message = F,
                                       anc = root.state)
@@ -67,6 +69,13 @@ CreateNull <- function(tree,                     # a tree type phylo
           CountTrans(current.map)
           cat('\n Null Simulation:\n')
           CountTrans(sim.anc.state.dt)
+        }
+      }
+      if(sim.count > 1000){
+        if(message){
+          cat('Unable to simulate a null with similar behavior to the observed.\n')
+          cat('Taking inability to recreate the obeserved under null conditions as significance.')
+          return('SIG')
         }
       }
     }
@@ -210,6 +219,7 @@ ProcessNullOneMean <- function(null.anc.cond, iter){
   }
   return(list('12' = vals12, '21' = vals21))
 }
+
 ProcessObservedNoMean <- function(observed.anc.cond){
   vals12 <- vector(length = length(observed.anc.cond))
   vals21 <- vector(length = length(observed.anc.cond))
@@ -237,6 +247,7 @@ ProcessNullNoMean <- function(null.anc.cond, iter){
   }
   return(list('12' = vals12, '21' = vals21))
 }
+
 plot.AncCond <- function(results){
   if(!is.na(results$pvals[1])){
     plot(density(results$null$`12`, na.rm = T),
