@@ -39,7 +39,9 @@ CreateNull <- function(tree,                     # a tree type phylo
                        current.map,             # for Q-matrix
                        anc.states.cont.trait,   # ancestral state reconstruction for continuous
                        dt.vec,
-                       message){   
+                       message,
+                       j,
+                       nsim){   
   current.Q <- current.map$Q
   if(sum(current.Q == 0)>0){
     current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
@@ -54,33 +56,47 @@ CreateNull <- function(tree,                     # a tree type phylo
     # while loop is set up to make sure sufficient transitions occur on the tree
     good.sim <- F
     sim.count <- 0
-    while(good.sim == F){
+    TO <- F
+    while(good.sim == F && TO == F){
       sim.count <- sim.count + 1
       sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                       nsim=1, message = F,
                                       anc = root.state)
-      if(table(getStates(sim.anc.state.dt, type = 'tips'))[1] >= .9 * table(dt.vec)[1] &&
-         table(getStates(sim.anc.state.dt, type = 'tips'))[1] <= 1.1 * table(dt.vec)[1]){
-        good.sim <- T
-        if(message){
-          cat('\014')
+      if(summary(current.map)$N > 5){
+        if(summary(sim.anc.state.dt)$N >= .8 * summary(current.map)$N &&
+           summary(sim.anc.state.dt)$N <= 1.2 * summary(current.map)$N){
+          good.sim <- T
+        }
+      }else if(summary(current.map)$N <= 5){
+        if(summary(sim.anc.state.dt)$N >= summary(current.map)$N - 1 &&
+           summary(sim.anc.state.dt)$N <= summary(current.map)$N + 1){
+          good.sim <- T
+        }
+      }
+      if(good.sim && message){
+        cat('\014')
+        cat('Analyzing map: ',j,' of ', nsim,'\n')
           cat('Number of transitions:\n')
           cat(' Emperical Map:\n')
-          CountTrans(current.map)
+          cat(summary(current.map)$N)
           cat('\n Null Simulation:\n')
-          CountTrans(sim.anc.state.dt)
-        }
+          cat(summary(sim.anc.state.dt)$N)
       }
-      if(sim.count > 1000){
+      if(sim.count > 10000){
         if(message){
           cat('Unable to simulate a null with similar behavior to the observed.\n')
-          cat('Taking inability to recreate the obeserved under null conditions as significance.')
-          return('SIG')
+          # return('SIG')
+          warning('Unable to simulate a null with similar values to the observed.\n')
         }
+        TO <- T
       }
     }
+    if(good.sim == T){
     nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
                                         anc.states.cont.trait = anc.states.cont.trait)
+    }else if(TO == T){
+      nulldist[[n]] <- list()
+    }
   }
   return(nulldist)
 }

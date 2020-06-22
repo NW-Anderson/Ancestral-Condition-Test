@@ -7,12 +7,12 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doMC)
+library(doSNOW)
 library(foreach)
-#cl<-makeCluster(3, type="SOCK")
-#on.exit(stopCluster(cl))
+cl<-makeCluster(3, type="SOCK")
+on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoMC(3)
+registerDoSNOW(cl)
 
 n.trees <- 100
 n.taxa <- 200

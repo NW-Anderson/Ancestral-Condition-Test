@@ -110,7 +110,9 @@ AncCond <- function(tree,
                                      current.map = anc.state.dt[[j]],
                                      anc.states.cont.trait = anc.states.cont.trait,
                                      dt.vec = dt.vec,
-                                     message = message)
+                                     message = message,
+                                     j = j,
+                                     nsim = nsim)
 
   }
   meantrans <- meantrans / nsim
