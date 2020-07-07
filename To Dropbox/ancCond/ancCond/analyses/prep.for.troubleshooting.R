@@ -80,7 +80,7 @@ while(good.sim == F){
 # we now apply the AncCond test to our simulated data and record its result
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
-nsim <- 100
+nsim <- 5
 iter <- 100
 drop.state <- NULL
 mat <- c(0,2,1,0)
@@ -185,14 +185,21 @@ rm(list=ls()[-c(24,6,8,14,21,16,18,10,15,14,13)])
 
 ##### running #####
 source('AncCond2.R')
+start <- Sys.time()
+profvis({
 testing <-  AncCond(tree,
                     data,
-                    drop.state,
+                    drop.state = 2,
                     mat,
                     pi,
                     n.tails,
                     nsim,
                     iter,
                     message)
- 
+})
+end <- Sys.time()
+end - start
+# 3.155765 mins
+# 13.79768 mins
 plot(testing)
+
