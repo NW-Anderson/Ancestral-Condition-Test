@@ -109,7 +109,8 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
                           rslt <- AncCond(tree = trees, 
                                           data = dat, 
-                                          message = T)
+                                          message = T,
+                                          nsim = 5)
                           p.val.vec[s] <- paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ',')
                           if(message == T){cat(' s = ', s)}
                         }
