@@ -5,18 +5,18 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoMC(5)
 
 n.trees <- 100
 n.taxa <- 200
 message <- T
 source('AncCond2.R', local = TRUE)
-scaling.factors <- c(1)
+scaling.factors <- c(1, 2, 5, 10)
 rate <- .4
 
 # we do the following for each of 200 trees
@@ -110,7 +110,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           message = T,
-                                          nsim = 5)
+                                          nsim = 50)
                           p.val.vec[s] <- paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ',')
                           if(message == T){cat(' s = ', s)}
                         }

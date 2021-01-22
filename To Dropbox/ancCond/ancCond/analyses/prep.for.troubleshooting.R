@@ -5,7 +5,7 @@ library(geiger)
 library(diversitree)
 ntaxa <- 200
 scale.factor <- 1
-rate <- .4
+rate <- .6
 
 tree <- trees(pars = c(3,1),
               type = "bd",
@@ -80,7 +80,7 @@ while(good.sim == F){
 # we now apply the AncCond test to our simulated data and record its result
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
-nsim <- 5
+nsim <- 10
 iter <- 100
 drop.state <- NULL
 mat <- c(0,2,1,0)
@@ -97,7 +97,7 @@ library(geiger)
 library(diversitree)
 ntaxa <- 200
 scale.factor <- 1
-rate <- .2
+rate <- .3
 tree <- trees(pars = c(3,1),
               type = "bd",
               n = 1,
@@ -174,7 +174,7 @@ data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 drop.state = NULL
 mat = c(0,0,1,0)
 pi = c(1,0)
-nsim <- 100
+nsim <- 10
 iter <- 100
 n.tails <- 1
 message <- T
@@ -187,15 +187,15 @@ rm(list=ls()[-c(24,6,8,14,21,16,18,10,15,14,13)])
 source('AncCond2.R')
 start <- Sys.time()
 profvis({
-testing <-  AncCond(tree,
-                    data,
-                    drop.state = 2,
-                    mat,
-                    pi,
-                    n.tails,
-                    nsim,
-                    iter,
-                    message)
+  testing <-  AncCond(tree,
+                      data,
+                      drop.state = 2,
+                      mat,
+                      pi,
+                      n.tails,
+                      nsim,
+                      iter,
+                      message)
 })
 end <- Sys.time()
 end - start
@@ -203,3 +203,46 @@ end - start
 # 13.79768 mins
 plot(testing)
 
+results1 <- AncCond(tree,
+                    data,
+                    drop.state,
+                    mat,
+                    pi,
+                    n.tails,
+                    nsim = 1,
+                    iter,
+                    message)
+
+results5 <- AncCond(tree,
+                    data,
+                    drop.state,
+                    mat,
+                    pi,
+                    n.tails,
+                    nsim = 5,
+                    iter,
+                    message)
+
+results10 <-  AncCond(tree,
+                      data,
+                      drop.state,
+                      mat,
+                      pi,
+                      n.tails,
+                      nsim = 10,
+                      iter,
+                      message)
+
+results20 <-  AncCond(tree,
+                      data,
+                      drop.state,
+                      mat,
+                      pi,
+                      n.tails,
+                      nsim = 20,
+                      iter,
+                      message)
+plot(results1)
+summary(results1)
+plot(results5)
+summary(results5)

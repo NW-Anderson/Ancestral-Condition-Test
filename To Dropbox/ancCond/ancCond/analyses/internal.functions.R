@@ -41,7 +41,9 @@ CreateNull <- function(tree,                     # a tree type phylo
                        dt.vec,
                        message,
                        j,
-                       nsim){   
+                       nsim,
+                       trans12,
+                       trans21){   
   current.Q <- current.map$Q
   if(sum(current.Q == 0)>0){
     current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
@@ -62,25 +64,33 @@ CreateNull <- function(tree,                     # a tree type phylo
       sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                       nsim=1, message = F,
                                       anc = root.state)
-      if(summary(current.map)$N > 5){
-        if(summary(sim.anc.state.dt)$N >= .8 * summary(current.map)$N &&
-           summary(sim.anc.state.dt)$N <= 1.2 * summary(current.map)$N){
-          good.sim <- T
+      good.sim12 <- good.sim21 <- F
+      if(dim(sim.anc.state.dt$mapped.edge)[2] == 2){
+        sim.trans <- exctractAncestral(current.map = sim.anc.state.dt, anc.states.cont.trait = anc.states.cont.trait, count = T)[[3]]
+        if(trans12 > 5){
+          if(sim.trans[1] >= .8 * trans12 && 
+             sim.trans[1] <= 1.2 * trans12){good.sim12 <- T}
+        }else if(trans12 <= 5){
+          if(sim.trans[1] >= trans12 - 1 && 
+             sim.trans[1] <= trans12 + 1){good.sim12 <- T}
         }
-      }else if(summary(current.map)$N <= 5){
-        if(summary(sim.anc.state.dt)$N >= summary(current.map)$N - 1 &&
-           summary(sim.anc.state.dt)$N <= summary(current.map)$N + 1){
-          good.sim <- T
+        if(trans21 > 5){
+          if(sim.trans[2] >= .8 * trans21 && 
+             sim.trans[2] <= 1.2 * trans21){good.sim21 <- T}
+        }else if(trans21 <= 5){
+          if(sim.trans[2] >= trans21 - 1 && 
+             sim.trans[2] <= trans21 + 1){good.sim21 <- T}
         }
       }
+      good.sim <- good.sim12 & good.sim21
       if(good.sim && message){
         cat('\014')
         cat('Analyzing map: ',j,' of ', nsim,'\n')
-          cat('Number of transitions:\n')
-          cat(' Emperical Map:\n')
-          cat(summary(current.map)$N)
-          cat('\n Null Simulation:\n')
-          cat(summary(sim.anc.state.dt)$N)
+        cat('Number of transitions:\n')
+        cat(' Emperical Map:\n')
+        cat(trans12, trans21)
+        cat('\n Null Simulation:\n')
+        cat(sim.trans)
       }
       if(sim.count > 10000){
         if(message){
@@ -92,8 +102,8 @@ CreateNull <- function(tree,                     # a tree type phylo
       }
     }
     if(good.sim == T){
-    nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
-                                        anc.states.cont.trait = anc.states.cont.trait)
+      nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
+                                          anc.states.cont.trait = anc.states.cont.trait)
     }else if(TO == T){
       nulldist[[n]] <- list()
     }
