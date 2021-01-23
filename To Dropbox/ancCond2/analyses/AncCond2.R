@@ -66,7 +66,9 @@ AncCond <- function(tree,
                n.tails,
                nsim,
                iter)
-  # should we unit length the tree???
+  # unit length input tree
+  tree$edge.length <- tree$edge.length / max(branching.times(tree))
+  
   # prepare data format
   unpackeddata <- UnpackData(data, drop.state)
   dt.vec <- unpackeddata[[1]]
@@ -89,39 +91,18 @@ AncCond <- function(tree,
   
   # processing our stoch maps to extract the ancestral condition and
   # construct the null
-  observed.anc.cond <- list()
-  null.anc.cond <- list()
-  meantrans <- vector(length = 2)
-  names(meantrans) <- c('12','21')
-  for(j in 1:nsim){
-    if(nsim == 1){
-      current.map <- anc.state.dt
-    }else{current.map <- anc.state.dt[[j]]}
-    if(message){
-      cat('\014')
-      cat('Analyzing map: ',j,' of ', nsim)
-    }
-    observed.anc.cond[[j]] <- exctractAncestral(current.map = current.map,
-                                                anc.states.cont.trait, count = T)
-    trans12 <- observed.anc.cond[[j]]$ntrans[1]
-    trans21 <- observed.anc.cond[[j]]$ntrans[2]
-    meantrans[1] <- meantrans[1] + trans12
-    meantrans[2] <- meantrans[2] + trans21
-    observed.anc.cond[[j]]$ntrans <- NULL
-    
-    # creating the null
-    null.anc.cond[[j]] <- CreateNull(tree = tree,
-                                     iter = iter,
-                                     current.map = current.map,
-                                     anc.states.cont.trait = anc.states.cont.trait,
-                                     dt.vec = dt.vec,
-                                     message = message,
-                                     j = j,
-                                     nsim = nsim,
-                                     trans12 = trans12,
-                                     trans21 = trans21)
-  }
-  meantrans <- meantrans / nsim
+  proc.maps <- ProcessMaps(anc.state.dt = anc.state.dt, 
+                           anc.states.cont.trait = anc.states.cont.trait, 
+                           tree = tree,
+                           iter = iter,
+                           dt.vec = dt.vec,
+                           message = message,
+                           nsim = nsim)
+  observed.anc.cond <- proc.maps$observed.anc.cond
+  null.anc.cond <- proc.maps$null.anc.cond
+  meantrans <- proc.maps$meantrans
+  rm(proc.maps)
+  
   obs.dist <- ProcessObserved(observed.anc.cond)
   null.dist <- ProcessNull(null.anc.cond, iter)
   
@@ -129,7 +110,7 @@ AncCond <- function(tree,
   names(results) <- c("observed","null")
   pvals <- CalcPVal(results, n.tails)
   
-  results <- list(obs.dist, null.dist,pvals, meantrans)
+  results <- list(obs.dist, null.dist, pvals, meantrans)
   names(results) <- c("observed","null",'pvals', 'mean n trans')
   class(results) <- "AncCond"
   

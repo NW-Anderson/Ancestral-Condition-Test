@@ -66,7 +66,10 @@ AncCond <- function(tree,
                n.tails,
                nsim,
                iter)
-  # should we unit length the tree???
+  
+  # unit length input tree
+  tree$edge.length <- tree$edge.length / max(branching.times(tree))
+  
   # prepare data format
   unpackeddata <- UnpackData(data, drop.state)
   dt.vec <- unpackeddata[[1]]
@@ -89,54 +92,24 @@ AncCond <- function(tree,
 
   # processing our stoch maps to extract the ancestral condition and
   # construct the null
-  observed.anc.cond <- list()
-  null.anc.cond <- list()
-  meantrans <- vector(length = 2)
-  names(meantrans) <- c('12','21')
-  for(j in 1:nsim){
-    if(nsim == 1){
-      current.map <- anc.state.dt
-    }else{current.map <- anc.state.dt[[j]]}
-    if(message){
-      cat('\014')
-      cat('Analyzing map: ',j,' of ', nsim)
-    }
-    observed.anc.cond[[j]] <- exctractAncestral(current.map = current.map,
-                                                anc.states.cont.trait, count = T)
-    trans12 <- observed.anc.cond[[j]]$ntrans[1]
-    trans21 <- observed.anc.cond[[j]]$ntrans[2]
-    meantrans[1] <- meantrans[1] + trans12
-    meantrans[2] <- meantrans[2] + trans21
-    observed.anc.cond[[j]]$ntrans <- NULL
-    
-    # creating the null
-    null.anc.cond[[j]] <- CreateNull(tree = tree,
-                                     iter = iter,
-                                     current.map = current.map,
-                                     anc.states.cont.trait = anc.states.cont.trait,
-                                     dt.vec = dt.vec,
-                                     message = message,
-                                     j = j,
-                                     nsim = nsim,
-                                     trans12 = trans12,
-                                     trans21 = trans21)
-  }
-  meantrans <- meantrans / nsim
+  proc.maps <- ProcessMaps(anc.state.dt = anc.state.dt, 
+                           anc.states.cont.trait = anc.states.cont.trait, 
+                           tree = tree,
+                           iter = iter,
+                           dt.vec = dt.vec,
+                           message = message,
+                           nsim = nsim)
+  observed.anc.cond <- proc.maps$observed.anc.cond
+  null.anc.cond <- proc.maps$null.anc.cond
+  meantrans <- proc.maps$meantrans
+  rm(proc.maps)
   
-  #########
+  #### 10 #####
   
   obs.dist <- ProcessObserved(observed.anc.cond)
   null.dist <- ProcessNull(null.anc.cond, iter)
-  plot(density(null.dist[[1]], na.rm = T),
-       main = paste('nsim = ', nsim),
-       xlim= c(min(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T),
-               max(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T)),
-       xlab = 'Ancestral Condition',
-       ylab = 'Frequency')
-  abline(v=obs.dist[1], col = 'red')
-  legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
+  quickplot(obs.dist, null.dist, lab = 10)
+ 
   results10 <- list(obs.dist, null.dist)
   names(results10) <- c("observed","null")
   pvals <- CalcPVal(results10, n.tails)
@@ -145,23 +118,15 @@ AncCond <- function(tree,
   names(results10) <- c("observed","null",'pvals', 'mean n trans')
   class(results10) <- "AncCond"
   
-  #######
+  #####  5 #####
   
   observed.anc.cond5 <- observed.anc.cond[1:5]
   null.anc.cond5 <- null.anc.cond[1:5]
   
-  obs.dist <- ProcessObserved(observed.anc.cond)
-  null.dist <- ProcessNull(null.anc.cond, iter)
-  plot(density(null.dist[[1]], na.rm = T),
-       main = paste('nsim = ', 5),
-       xlim= c(min(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T),
-               max(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T)),
-       xlab = 'Ancestral Condition',
-       ylab = 'Frequency')
-  abline(v=obs.dist[1], col = 'red')
-  legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
+  obs.dist <- ProcessObserved(observed.anc.cond5)
+  null.dist <- ProcessNull(null.anc.cond5, iter)
+  quickplot(obs.dist, null.dist, lab = 5)
+  
   results5 <- list(obs.dist, null.dist)
   names(results5) <- c("observed","null")
   pvals <- CalcPVal(results5, n.tails)
@@ -170,23 +135,16 @@ AncCond <- function(tree,
   names(results5) <- c("observed","null",'pvals', 'mean n trans')
   class(results5) <- "AncCond"
   
-  ########
+  ####  2 ####
   
   observed.anc.cond2 <- observed.anc.cond[1:2]
   null.anc.cond2 <- null.anc.cond[1:2]
   
-  obs.dist <- ProcessObserved(observed.anc.cond)
-  null.dist <- ProcessNull(null.anc.cond, iter)
-  plot(density(null.dist[[1]], na.rm = T),
-       main = paste('nsim = ', 5),
-       xlim= c(min(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T),
-               max(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T)),
-       xlab = 'Ancestral Condition',
-       ylab = 'Frequency')
-  abline(v=obs.dist[1], col = 'red')
-  legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
+  obs.dist <- ProcessObserved(observed.anc.cond2)
+  null.dist <- ProcessNull(null.anc.cond2, iter)
+  
+  quickplot(obs.dist, null.dist, lab = 2)
+  
   results2 <- list(obs.dist, null.dist)
   names(results2) <- c("observed","null")
   pvals <- CalcPVal(results2, n.tails)
@@ -195,23 +153,16 @@ AncCond <- function(tree,
   names(results2) <- c("observed","null",'pvals', 'mean n trans')
   class(results2) <- "AncCond"
   
-  #########
+  ####  1 #####
   
-  observed.anc.cond <- list(observed.anc.cond[[1]])
-  null.anc.cond <- list(null.anc.cond[[1]])
+  observed.anc.cond1 <- list(observed.anc.cond[[1]])
+  null.anc.cond1 <- list(null.anc.cond[[1]])
   
-  obs.dist <- ProcessObserved(observed.anc.cond)
-  null.dist <- ProcessNull(null.anc.cond, iter)
-  plot(density(null.dist[[1]], na.rm = T),
-       main = 'Mean of Means',
-       xlim= c(min(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T),
-               max(c(null.dist[[1]],
-                     obs.dist[1]), na.rm = T)),
-       xlab = 'Ancestral Condition',
-       ylab = 'Frequency')
-  abline(v=obs.dist[1], col = 'red')
-  legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
+  obs.dist <- ProcessObserved(observed.anc.cond1)
+  null.dist <- ProcessNull(null.anc.cond1, iter)
+  
+  quickplot(obs.dist, null.dist, lab = 1)
+  
   results1 <- list(obs.dist, null.dist)
   names(results1) <- c("observed","null")
   pvals <- CalcPVal(results1, n.tails)
@@ -219,6 +170,7 @@ AncCond <- function(tree,
   results1 <- list(obs.dist, null.dist,pvals, meantrans)
   names(results1) <- c("observed","null",'pvals', 'mean n trans')
   class(results1) <- "AncCond"
+  #######
   
   summary(results10)
   summary(results5)

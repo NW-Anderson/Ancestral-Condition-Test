@@ -140,7 +140,7 @@ AncCond <- function(tree,
   results10 <- list(obs.dist, null.dist)
   names(results10) <- c("observed","null")
   pvals <- CalcPVal(results10, n.tails)
-  
+
   results10 <- list(obs.dist, null.dist,pvals, meantrans)
   names(results10) <- c("observed","null",'pvals', 'mean n trans')
   class(results10) <- "AncCond"
@@ -178,7 +178,7 @@ AncCond <- function(tree,
   obs.dist <- ProcessObserved(observed.anc.cond)
   null.dist <- ProcessNull(null.anc.cond, iter)
   plot(density(null.dist[[1]], na.rm = T),
-       main = paste('nsim = ', 5),
+       main = paste('nsim = ', 2),
        xlim= c(min(c(null.dist[[1]],
                      obs.dist[1]), na.rm = T),
                max(c(null.dist[[1]],
@@ -203,7 +203,7 @@ AncCond <- function(tree,
   obs.dist <- ProcessObserved(observed.anc.cond)
   null.dist <- ProcessNull(null.anc.cond, iter)
   plot(density(null.dist[[1]], na.rm = T),
-       main = 'Mean of Means',
+       main = paste('nsim = ', 1),
        xlim= c(min(c(null.dist[[1]],
                      obs.dist[1]), na.rm = T),
                max(c(null.dist[[1]],
@@ -220,7 +220,7 @@ AncCond <- function(tree,
   names(results1) <- c("observed","null",'pvals', 'mean n trans')
   class(results1) <- "AncCond"
   
-  summary(results10)
+  # summary(results10)
   summary(results5)
   summary(results2)
   summary(results1)

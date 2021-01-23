@@ -364,3 +364,61 @@ CountTrans <- function(current.map){
   cat(ntrans)
 }
 
+ProcessMaps <- function(anc.state.dt, 
+            anc.states.cont.trait, 
+            tree,
+            iter,
+            dt.vec,
+            message,
+            nsim){
+  observed.anc.cond <- list()
+  null.anc.cond <- list()
+  meantrans <- vector(length = 2)
+  names(meantrans) <- c('12','21')
+  for(j in 1:nsim){
+    if(nsim == 1){
+      current.map <- anc.state.dt
+    }else{current.map <- anc.state.dt[[j]]}
+    if(message){
+      cat('\014')
+      cat('Analyzing map: ',j,' of ', nsim)
+    }
+    observed.anc.cond[[j]] <- exctractAncestral(current.map = current.map,
+                                                anc.states.cont.trait, count = T)
+    trans12 <- observed.anc.cond[[j]]$ntrans[1]
+    trans21 <- observed.anc.cond[[j]]$ntrans[2]
+    meantrans[1] <- meantrans[1] + trans12
+    meantrans[2] <- meantrans[2] + trans21
+    observed.anc.cond[[j]]$ntrans <- NULL
+    
+    # creating the null
+    null.anc.cond[[j]] <- CreateNull(tree = tree,
+                                     iter = iter,
+                                     current.map = current.map,
+                                     anc.states.cont.trait = anc.states.cont.trait,
+                                     dt.vec = dt.vec,
+                                     message = message,
+                                     j = j,
+                                     nsim = nsim,
+                                     trans12 = trans12,
+                                     trans21 = trans21)
+  }
+  meantrans <- meantrans / nsim
+  return(list('observed.anc.cond' = observed.anc.cond,
+              'null.anc.cond' = null.anc.cond,
+              'meantrans' = meantrans))
+}
+
+##### testing functions not necessary for the actual package
+quickplot <- function(obs.dist, null.dist, lab){
+plot(density(null.dist[[1]], na.rm = T),
+     main = paste('nsim = ', lab),
+     xlim= c(min(c(null.dist[[1]],
+                   obs.dist[1]), na.rm = T),
+             max(c(null.dist[[1]],
+                   obs.dist[1]), na.rm = T)),
+     xlab = 'Ancestral Condition',
+     ylab = 'Frequency')
+abline(v=obs.dist[1], col = 'red')
+legend(x = 'topright', legend = c('Observed', 'Null'), col  = c('red', 'black'), lwd = 2)
+}
