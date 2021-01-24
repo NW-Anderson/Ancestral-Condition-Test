@@ -59,12 +59,12 @@ AncCond <- function(tree, # phylo object
                               message = message)
 
   null <- CreateNull(tree,                     # a tree type phylo
-                         iter=100,                     # number of simulations for null
-                         anc.states.cont.trait=anc.states.cont.trait,   # ancestral state reconstruction for continuous
-                         anc.state.dt=anc.state.dt,
-                         dt.vec=dt.vec,
-                         message=message,
-                         nsim=nsim)
+                     iter=100,                     # number of simulations for null
+                     anc.states.cont.trait = anc.states.cont.trait,   # ancestral state reconstruction for continuous
+                     anc.state.dt = anc.state.dt,
+                     dt.vec = dt.vec,
+                     message = message,
+                     nsim = nsim)
 
   results <- list(observed, null)
   names(results) <- c("observed","null")

@@ -219,9 +219,9 @@ CreateNull <- function(tree,                     # a tree type phylo
         cat('Analyzing map: ',j,' of ', nsim,'\n')
         cat('Number of transitions:\n')
         cat(' Emperical Map:\n')
-        cat(trans12, trans21)
+        #cat(trans12, trans21)
         cat('\n Null Simulation:\n')
-        cat(sim.trans)
+        #cat(sim.trans)
       }
       if(sim.count > 10000){
         if(message){
@@ -262,7 +262,7 @@ CreateNull <- function(tree,                     # a tree type phylo
 
 
 
-
+#TODO
 ProcessNull <- function(null.anc.cond, iter){
   vals12 <- vector(length = length(null.anc.cond))
   vals21 <- vector(length = length(null.anc.cond))
