@@ -80,7 +80,7 @@ while(good.sim == F){
 # we now apply the AncCond test to our simulated data and record its result
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
-nsim <- 10
+nsim <- 100
 iter <- 100
 drop.state <- NULL
 mat <- c(0,2,1,0)
