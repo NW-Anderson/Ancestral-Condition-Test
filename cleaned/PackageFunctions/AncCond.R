@@ -16,7 +16,8 @@ AncCond <- function(tree, # phylo object
                     data, # dataframe 3 columns species names, continuous, discrete
                     drop.state = NULL, # state to drop
                     #TODO fix to be the same as ACE
-                    mat = c(0, 2, 1, 0), # numeric vector default description of model for discrete trait
+                    model = "ARD",
+                    # mat = c(0, 2, 1, 0), # numeric vector default description of model for discrete trait
                     pi="estimated", # text string
                     n.tails = 1, # calc p-value on high or low values
                     #TODO evaluate for a better naming and usage structure
@@ -47,7 +48,7 @@ AncCond <- function(tree, # phylo object
   # Stochastic maps for discrete trait using mcmc to account
   # for uncertainty in rates and history
   anc.state.dt <- make.simmap(tree, dt.vec,
-                              model = matrix(mat, 2, 2),
+                              model = make.model.mat(model),
                               nsim = nsim,
                               pi = pi,
                               Q = 'mcmc',
@@ -59,7 +60,7 @@ AncCond <- function(tree, # phylo object
                               message = message)
 
   null <- CreateNull(tree,                     # a tree type phylo
-                     iter=100,                     # number of simulations for null
+                     iter,                     # number of simulations for null
                      anc.states.cont.trait = anc.states.cont.trait,   # ancestral state reconstruction for continuous
                      anc.state.dt = anc.state.dt,
                      dt.vec = dt.vec,

@@ -14,9 +14,13 @@ InputTesting <- function(tree,
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
   if(!is.null(drop.state)) if(!drop.state %in% c(1,2)){stop('drop.state must be NULL, or numeric 1 or 2')}
-  if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
-    stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
+  if(model != "ARD" & model != "ER" & model != "UNI"){
+    stop('model must be of the form "ARD" or "ER" for a bidirectional model with different and equal rates for forward transitions 
+         respectively or "UNI" for unidirectional model')
   }
+  # if(!sum(mat == c(0,0,1,0)) == 4 & !sum(mat == c(0,1,1,0)) == 4 & !sum(mat == c(0,2,1,0)) == 4){
+  #   stop('mat must be a vector of the form c(0,0,1,0), c(0,1,1,0), or c(0,2,1,0)')
+  # }
   if((!pi %in% c('equal', 'estimated'))[1]){
     if(!is.numeric(pi)) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
     if(length(pi) != 2 | sum(pi) != 1) stop('pi must be equal, estimated or a vector of length 2\nwith probabilities for the state of the discrete character at the root')
@@ -28,10 +32,17 @@ InputTesting <- function(tree,
                       greater or equal to 100 to ensure an accurate pvalue')}
 }
 
+## TODO idk where else this is used
 quiet <- function(x) {
   sink(tempfile())
   on.exit(sink())
   invisible(force(x))
+}
+
+make.model.mat <- function(model){
+  if(model == 'ARD'){return(matrix(c(0,2,1,0),2,2))}
+  if(model == 'ER'){return(matrix(c(0,1,1,0),2,2))}
+  if(model == 'UNI'){return(matrix(c(0,0,1,0),2,2))}
 }
 
 # takes data and any state to be dropped and generates the

@@ -83,7 +83,8 @@ data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 nsim <- 100
 iter <- 100
 drop.state <- NULL
-mat <- c(0,2,1,0)
+#mat <- c(0,2,1,0)
+model = 'ARD'
 pi <- 'estimated'
 n.tails <- 2
 message <- T
