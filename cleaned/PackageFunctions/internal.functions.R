@@ -228,11 +228,11 @@ CreateNull <- function(tree,                     # a tree type phylo
       if(good.sim && message){
         cat('\014')
         cat('Analyzing map: ',j,' of ', nsim,'\n')
-        cat('Number of transitions:\n')
-        cat(' Emperical Map:\n')
-        #cat(trans12, trans21)
-        cat('\n Null Simulation:\n')
-        #cat(sim.trans)
+        # cat('Number of transitions:\n')
+        # cat(' Emperical Map:\n')
+        # #cat(trans12, trans21)
+        # cat('\n Null Simulation:\n')
+        # #cat(sim.trans)
       }
       if(sim.count > 10000){
         if(message){
