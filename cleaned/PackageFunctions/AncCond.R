@@ -72,10 +72,10 @@ AncCond <- function(tree, # phylo object
   pvals <- CalcPVal(results = results,
                     n.tails)
 
-  results <- list(obs.dist, null.dist, pvals, meantrans)
-  names(results) <- c("observed","null",'pvals', 'mean n trans')
+  results <- list(observed, null, pvals)
+  names(results) <- c("observed","null",'pvals')
   class(results) <- "AncCond"
-
+  ### TODO fix summary
   if(message) summary(results)
   return(results)
 }

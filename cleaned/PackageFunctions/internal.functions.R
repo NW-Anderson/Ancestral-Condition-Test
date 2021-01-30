@@ -169,6 +169,7 @@ CreateNull <- function(tree,                     # a tree type phylo
   null.anc.cond <- list()
   for(j in 1:nsim){
   # HB todo fix to work with my crap
+    ##nwa idk what you mean it is working fine??
   current.Q <- anc.state.dt[[j]]$Q
   current.map <- anc.state.dt[[j]]
   if(sum(current.Q == 0)>0){
