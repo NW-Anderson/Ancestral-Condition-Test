@@ -10,7 +10,7 @@ InputTesting <- function(tree,
                          nsim,
                          iter){
   ##### testing inputs #####
-
+  
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
   if(!is.data.frame(data) & ncol(data) == 3){stop('data should be a dataframe with 3 columns\n(tip labels, cont data, discrete data)')}
   if(!is.null(drop.state)) if(!drop.state %in% c(1,2)){stop('drop.state must be NULL, or numeric 1 or 2')}
@@ -51,8 +51,8 @@ UnpackData <- function(data, drop.state){
   ##### create named vector for disc trait for all taxa #####
   dt.vec <- data[, 3]
   names(dt.vec) <- data[, 1]
-
-
+  
+  
   ##### create named vector for cont trait taxa not in derived state #####
   if(!is.null(drop.state)){
     ct.data <- data[(data[, 3] != drop.state),]
@@ -83,11 +83,11 @@ exctractAncestral <- function(current.map,
   # gets branches with transitions
   ss_nodes <- current.map$mapped.edge[, 1] > 0 &
     current.map$mapped.edge[, 2] > 0
-
+  
   # this returns the node pairs describing a branch with transitions
   wanted_branches <- ss_nodes[ss_nodes == T]
   wanted_nodes <- names(wanted_branches)
-
+  
   # for the general model we partition the producing nodes for 1->2 and 1<-2 transitions
   producing.nodes12 <- c()
   producing.nodes21 <-c()
@@ -107,8 +107,8 @@ exctractAncestral <- function(current.map,
   names(ntrans) <- c('12','21')
   producing.nodes12 <- unique(producing.nodes12)
   producing.nodes21 <- unique(producing.nodes21)
-
-
+  
+  
   ##### get estimated ancestral conditions ######
   if(count == T){
     observed.anc.cond <- list('12' = anc.states.cont.trait$ace[names(anc.states.cont.trait$ace) %in%
@@ -168,127 +168,130 @@ CreateNull <- function(tree,                     # a tree type phylo
                        nsim){
   null.anc.cond <- list()
   for(j in 1:nsim){
-  # HB todo fix to work with my crap
+    # HB todo fix to work with my crap
     ##nwa idk what you mean it is working fine??
-  current.Q <- anc.state.dt[[j]]$Q
-  current.map <- anc.state.dt[[j]]
-  if(sum(current.Q == 0)>0){
-    current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
-    cat('\n')
-    print("Your estimated transition matrix has a rate of zero for some parameters these are being set to 10e-25 for simulation purposes")
-  }
-  # sets current root state for the map
-  root.state <- c(0,0)
-  names(root.state) <- 1:2
-  root.state[names(root.state) == names(current.map$maps[[1]])[1]] <- 1
-  nulldist <- vector(length=iter, mode="list")
-  # this will create iter estimates of our statistic
-  for(n in 1:iter){
-    # while loop is set up to make sure sufficient transitions occur on the tree
-    good.sim <- F
-    sim.count <- 0
-    TO <- F
-    while(good.sim == F && TO == F){
-      if(sim.count %% 50 == 0) print(sim.count)
-      sim.count <- sim.count + 1
-      sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
-                                      nsim=1, message = F,
-                                      anc = root.state)
-      if(sum(dt.vec == 1) < .5*length(dt.vec)){
-        rarestate <- 1
-      }else{
-        rarestate <- 2
-      }
-      rare.count <- sum(dt.vec == rarestate)
-      rare.bounds <- round(c(rare.count * 0.5, rare.count * 1.5))
-      rare.sim <- sum(sim.anc.state.dt$states == rarestate)
-      if(rare.bounds[1] <= rare.sim & rare.sim <= rare.bounds[2]){
-        good.sim <- T
-      }
-
-
-      # good.sim12 <- good.sim21 <- F
-      # if(dim(sim.anc.state.dt$mapped.edge)[2] == 2){
-      #   sim.trans <- exctractAncestral(current.map = sim.anc.state.dt, anc.states.cont.trait = anc.states.cont.trait, count = T)[[3]]
-      #   if(trans12 > 5){
-      #     if(sim.trans[1] >= .8 * trans12 &&
-      #        sim.trans[1] <= 1.2 * trans12){good.sim12 <- T}
-      #   }else if(trans12 <= 5){
-      #     if(sim.trans[1] >= trans12 - 1 &&
-      #        sim.trans[1] <= trans12 + 1){good.sim12 <- T}
-      #   }
-      #   if(trans21 > 5){
-      #     if(sim.trans[2] >= .8 * trans21 &&
-      #        sim.trans[2] <= 1.2 * trans21){good.sim21 <- T}
-      #   }else if(trans21 <= 5){
-      #     if(sim.trans[2] >= trans21 - 1 &&
-      #        sim.trans[2] <= trans21 + 1){good.sim21 <- T}
-      #   }
-      # }
-      #good.sim <- good.sim12 & good.sim21
-      if(good.sim && message){
-        cat('\014')
-        cat('Analyzing map: ',j,' of ', nsim,'\n')
-        # cat('Number of transitions:\n')
-        # cat(' Emperical Map:\n')
-        # #cat(trans12, trans21)
-        # cat('\n Null Simulation:\n')
-        # #cat(sim.trans)
-      }
-      if(sim.count > 10000){
-        if(message){
-          cat('Unable to simulate a null with similar behavior to the observed.\n')
-          # return('SIG')
-          warning('Unable to simulate a null with similar values to the observed.\n')
+    current.Q <- anc.state.dt[[j]]$Q
+    current.map <- anc.state.dt[[j]]
+    if(sum(current.Q == 0)>0){
+      current.Q[current.Q == 0] <- c(10^(-25),-10^(-25))
+      cat('\n')
+      print("Your estimated transition matrix has a rate of zero for some parameters these are being set to 10e-25 for simulation purposes")
+    }
+    # sets current root state for the map
+    root.state <- c(0,0)
+    names(root.state) <- 1:2
+    root.state[names(root.state) == names(current.map$maps[[1]])[1]] <- 1
+    nulldist <- vector(length=iter, mode="list")
+    # this will create iter estimates of our statistic
+    for(n in 1:iter){
+      # while loop is set up to make sure sufficient transitions occur on the tree
+      good.sim <- F
+      sim.count <- 0
+      TO <- F
+      while(good.sim == F && TO == F){
+        if(sim.count %% 50 == 0) print(sim.count)
+        sim.count <- sim.count + 1
+        sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
+                                        nsim=1, message = F,
+                                        anc = root.state)
+        if(sum(dt.vec == 1) < .5*length(dt.vec)){
+          rarestate <- 1
+        }else{
+          rarestate <- 2
         }
-        TO <- T
+        rare.count <- sum(dt.vec == rarestate)
+        rare.bounds <- round(c(rare.count * 0.5, rare.count * 1.5))
+        rare.sim <- sum(sim.anc.state.dt$states == rarestate)
+        if(rare.bounds[1] <= rare.sim & rare.sim <= rare.bounds[2]){
+          good.sim <- T
+        }
+        
+        
+        # good.sim12 <- good.sim21 <- F
+        # if(dim(sim.anc.state.dt$mapped.edge)[2] == 2){
+        #   sim.trans <- exctractAncestral(current.map = sim.anc.state.dt, anc.states.cont.trait = anc.states.cont.trait, count = T)[[3]]
+        #   if(trans12 > 5){
+        #     if(sim.trans[1] >= .8 * trans12 &&
+        #        sim.trans[1] <= 1.2 * trans12){good.sim12 <- T}
+        #   }else if(trans12 <= 5){
+        #     if(sim.trans[1] >= trans12 - 1 &&
+        #        sim.trans[1] <= trans12 + 1){good.sim12 <- T}
+        #   }
+        #   if(trans21 > 5){
+        #     if(sim.trans[2] >= .8 * trans21 &&
+        #        sim.trans[2] <= 1.2 * trans21){good.sim21 <- T}
+        #   }else if(trans21 <= 5){
+        #     if(sim.trans[2] >= trans21 - 1 &&
+        #        sim.trans[2] <= trans21 + 1){good.sim21 <- T}
+        #   }
+        # }
+        #good.sim <- good.sim12 & good.sim21
+        if(good.sim && message){
+          cat('\014')
+          cat('Analyzing map: ',j,' of ', nsim,'\n')
+          # cat('Number of transitions:\n')
+          # cat(' Emperical Map:\n')
+          # #cat(trans12, trans21)
+          # cat('\n Null Simulation:\n')
+          # #cat(sim.trans)
+        }
+        if(sim.count > 10000){
+          if(message){
+            cat('Unable to simulate a null with similar behavior to the observed.\n')
+            # return('SIG')
+            warning('Unable to simulate a null with similar values to the observed.\n')
+          }
+          TO <- T
+        }
+      }
+      if(good.sim == T){
+        nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
+                                            anc.states.cont.trait = anc.states.cont.trait)
+      }else if(TO == T){
+        nulldist[[n]] <- list()
       }
     }
-    if(good.sim == T){
-      nulldist[[n]] <-  exctractAncestral(current.map = sim.anc.state.dt,
-                                          anc.states.cont.trait = anc.states.cont.trait)
-    }else if(TO == T){
-      nulldist[[n]] <- list()
+    null.anc.cond[[j]] <- nulldist
+  }
+  
+  #####
+  
+  
+  
+  # vals12 <- vector(length = length(null.anc.cond))
+  # vals21 <- vector(length = length(null.anc.cond))
+  # for(j in 1:iter){
+  #   cur.sim12 <- cur.sim21 <- c()
+  #   for(i in 1:length(null.anc.cond)){
+  #     cur.sim12[i] <- mean(null.anc.cond[[i]][[j]]$'12', na.rm = T)
+  #     cur.sim21[i] <- mean(null.anc.cond[[i]][[j]]$'21', na.rm = T)
+  #   }
+  #   vals12[j] <- mean(cur.sim12, na.rm = T)
+  #   vals21[j] <- mean(cur.sim21, na.rm = T)
+  # }
+  # # return(list('12' = vals12, '21' = vals21))
+  # res.old <- list('12' = vals12, '21' = vals21)
+  # 
+  
+  tree.means12 <- array(dim = c(nsim, iter))
+  tree.means21 <- array(dim = c(nsim, iter))
+  for(i in 1:nsim){
+    for(j in 1:iter){
+      tree.means12[i,j] <- mean(null.anc.cond[[i]][[j]]$'12', na.rm = T)
+      tree.means21[i,j] <- mean(null.anc.cond[[i]][[j]]$'21', na.rm = T)
     }
   }
-  null.anc.cond[[j]] <- nulldist
+  for(i in 1:nsim){
+    tree.means12[i,1:iter] <- sort(tree.means12[i,], na.last = T)
+    tree.means21[i,1:iter] <- sort(tree.means21[i,], na.last = T)
   }
-  vals12 <- vector(length = length(null.anc.cond))
-  vals21 <- vector(length = length(null.anc.cond))
-  for(j in 1:iter){
-    cur.sim12 <- cur.sim21 <- c()
-    for(i in 1:length(null.anc.cond)){
-      cur.sim12[i] <- mean(null.anc.cond[[i]][[j]]$'12', na.rm = T)
-      cur.sim21[i] <- mean(null.anc.cond[[i]][[j]]$'21', na.rm = T)
-    }
-    vals12[j] <- mean(cur.sim12, na.rm = T)
-    vals21[j] <- mean(cur.sim21, na.rm = T)
-  }
+  vals12 <- colMeans(tree.means12, na.rm = T)
+  vals21 <- colMeans(tree.means21, na.rm = T)
+  
+  
   return(list('12' = vals12, '21' = vals21))
 }
 
-
-
-
-
-
-
-
-#TODO
-ProcessNull <- function(null.anc.cond, iter){
-  vals12 <- vector(length = length(null.anc.cond))
-  vals21 <- vector(length = length(null.anc.cond))
-  for(j in 1:iter){
-    cur.sim12 <- cur.sim21 <- c()
-    for(i in 1:length(null.anc.cond)){
-      cur.sim12[i] <- mean(null.anc.cond[[i]][[j]]$'12', na.rm = T)
-      cur.sim21[i] <- mean(null.anc.cond[[i]][[j]]$'21', na.rm = T)
-    }
-    vals12[j] <- mean(cur.sim12, na.rm = T)
-    vals21[j] <- mean(cur.sim21, na.rm = T)
-  }
-  return(list('12' = vals12, '21' = vals21))
-}
 
 plot.AncCond <- function(results){
   if(!is.na(results$pvals[1])){
@@ -350,22 +353,22 @@ summary.AncCond <- function(results){
     round(results$observed[2], digits = 4),
     "\n\n"
   ))
-  cat(paste('Mean number of 1 -> 2 transitions:', round(results$`mean n trans`[1], digits = 4), '\n'))
-  cat(paste('Mean number of 2 -> 1 transitions:', round(results$`mean n trans`[2], digits = 4), '\n\n'))
-  # cat(paste("Number of producing nodes 1->2:", round(mean(number.of.trans12),
-  #                                                    digits = 4), "\n"))
-  # cat(paste("Number of producing nodes 2->1:", round(mean(number.of.trans21),
-  #                                                    digits = 4), "\n"))
+  # cat(paste('Mean number of 1 -> 2 transitions:', round(results$`mean n trans`[1], digits = 4), '\n'))
+  # cat(paste('Mean number of 2 -> 1 transitions:', round(results$`mean n trans`[2], digits = 4), '\n\n'))
+  # # cat(paste("Number of producing nodes 1->2:", round(mean(number.of.trans12),
+  # #                                                    digits = 4), "\n"))
+  # # cat(paste("Number of producing nodes 2->1:", round(mean(number.of.trans21),
+  # #                                                    digits = 4), "\n"))
   cat(paste("Mean of null dist 1->2:", round(mean(results$null$`12`, na.rm = T),
                                              digits = 4), "\n"))
   cat(paste("Mean of null dist 2->1:", round(mean(results$null$`21`, na.rm = T),
                                              digits = 4), "\n\n"))
   cat(paste("SD of null dist 1->2:", round(sd(results$null$`12`, na.rm = T), digits = 4), "\n"))
   cat(paste("SD of null dist 2->1:", round(sd(results$null$`21`, na.rm = T), digits = 4), "\n\n"))
-
+  
   cat(paste("pvalue 1->2:", round(results$pvals[1], digits = 4), "\n"))
   cat(paste("pvalue 2->1:", round(results$pvals[2], digits = 4), "\n\n\n"))
-
+  
   if(is.na(results$pvals[1])){
     cat('NA and NaN values are produced when no transitions of a type have occured. \n\n')
   }
@@ -381,12 +384,12 @@ CountTrans <- function(current.map){
 }
 
 ProcessMaps <- function(anc.state.dt,
-            anc.states.cont.trait,
-            tree,
-            iter,
-            dt.vec,
-            message,
-            nsim){
+                        anc.states.cont.trait,
+                        tree,
+                        iter,
+                        dt.vec,
+                        message,
+                        nsim){
   # observed.anc.cond <- list()
   # null.anc.cond <- list()
   # meantrans <- vector(length = 2)

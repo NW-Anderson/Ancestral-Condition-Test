@@ -4,7 +4,7 @@ library(phytools)
 library(geiger)
 library(diversitree)
 ntaxa <- 200
-scale.factor <- 1
+scale.factor <- 5
 rate <- .6
 
 tree <- trees(pars = c(3,1),
