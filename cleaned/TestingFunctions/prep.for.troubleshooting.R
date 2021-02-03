@@ -4,7 +4,7 @@ library(phytools)
 library(geiger)
 library(diversitree)
 ntaxa <- 200
-scale.factor <- 5
+scale.factor <- 10
 rate <- .6
 
 tree <- trees(pars = c(3,1),
@@ -97,7 +97,7 @@ library(phytools)
 library(geiger)
 library(diversitree)
 ntaxa <- 200
-scale.factor <- 1
+scale.factor <- 10
 rate <- .3
 tree <- trees(pars = c(3,1),
               type = "bd",
@@ -173,9 +173,9 @@ while(good.sim == F){
 data <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
 
 drop.state = NULL
-mat = c(0,0,1,0)
+model = "UNI"
 pi = c(1,0)
-nsim <- 10
+nsim <- 100
 iter <- 100
 n.tails <- 1
 message <- T

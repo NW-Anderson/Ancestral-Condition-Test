@@ -168,6 +168,7 @@ CreateNull <- function(tree,                     # a tree type phylo
                        nsim){
   null.anc.cond <- list()
   for(j in 1:nsim){
+    if(message & (j == 1 | j%%5 == 0)) cat('Analyzing map: ',j,' of ', nsim,'\n')
     # HB todo fix to work with my crap
     ##nwa idk what you mean it is working fine??
     current.Q <- anc.state.dt[[j]]$Q
@@ -226,15 +227,15 @@ CreateNull <- function(tree,                     # a tree type phylo
         #   }
         # }
         #good.sim <- good.sim12 & good.sim21
-        if(good.sim && message){
-          cat('\014')
-          cat('Analyzing map: ',j,' of ', nsim,'\n')
-          # cat('Number of transitions:\n')
-          # cat(' Emperical Map:\n')
-          # #cat(trans12, trans21)
-          # cat('\n Null Simulation:\n')
-          # #cat(sim.trans)
-        }
+        # if(good.sim && message){
+        #   cat('\014')
+        #   cat('Analyzing map: ',j,' of ', nsim,'\n')
+        #   # cat('Number of transitions:\n')
+        #   # cat(' Emperical Map:\n')
+        #   # #cat(trans12, trans21)
+        #   # cat('\n Null Simulation:\n')
+        #   # #cat(sim.trans)
+        # }
         if(sim.count > 10000){
           if(message){
             cat('Unable to simulate a null with similar behavior to the observed.\n')
