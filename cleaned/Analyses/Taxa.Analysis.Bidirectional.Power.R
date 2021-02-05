@@ -16,7 +16,7 @@ registerDoSNOW(cl)
 
 n.trees <- 100
 scale.factor <- 5
-n.taxa <- seq(20, 200, length.out = 10)
+n.taxa <- c(20,50,100,150,200)
 source('AncCond.R', local = TRUE)
 message <- T
 rate <- .6

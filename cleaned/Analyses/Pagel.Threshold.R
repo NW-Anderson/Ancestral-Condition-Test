@@ -57,88 +57,93 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoMC(3)
 
+rate <- .3
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond2.R', local = TRUE)
-
-pval.array <- p.val.array <- array(dim = c(n.trees, 3))
+source('AncCond.R', local = TRUE)
 
 
-for(t in 1:n.trees){
-  tree <- trees(pars = c(3,1),
-                 type = "bd",
-                 n = 1,
-                 max.taxa = n.taxa,
-                 include.extinct = F)[[1]]
-  tree$edge.length <- tree$edge.length / max(branching.times(tree))
+for(scaling.factor in c(1,5)){
+  pval.array <- p.val.array <- array(dim = c(n.trees, 3))
   
-  # we then simulate the continious character
-  cont.trait <- sim.char(tree, 0.2, model = 'BM')
-  names(cont.trait) <- tree$tip.label # this line somehow makes anc.ML work????
   
-  # identifying which branch had a mean cont trait value in the upper and lower quartiles
-  # we do this by 1st doing an ASR for the continious trait
-  cont.trait.AC <- anc.ML(tree, cont.trait, model = "BM")
-  alt.tree <- BranchScaling(tree,scaling.factor = 1,cont.trait.AC)
-  # next we simulated a discrete trait on this altered tree
-  # while loop is set up to make sure sufficient transitions occur on the tree
-  good.sim <- F
-  rate <- .1
-  while(good.sim == F){
-    disc.trait <- sim.char(phy = alt.tree,
-                           par = matrix(c(-rate, 0, rate, 0), 2),
-                           model = 'discrete',
-                           root = 1)
-    if((0.05 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
-       sum(disc.trait == min(disc.trait)) < (.95 * n.taxa)){
-      good.sim <- T
+  for(t in 1:n.trees){
+    tree <- trees(pars = c(3,1),
+                  type = "bd",
+                  n = 1,
+                  max.taxa = n.taxa,
+                  include.extinct = F)[[1]]
+    tree$edge.length <- tree$edge.length / max(branching.times(tree))
+    
+    # we then simulate the continious character
+    cont.trait <- sim.char(tree, 0.2, model = 'BM')
+    names(cont.trait) <- tree$tip.label # this line somehow makes anc.ML work????
+    
+    # identifying which branch had a mean cont trait value in the upper and lower quartiles
+    # we do this by 1st doing an ASR for the continious trait
+    cont.trait.AC <- anc.ML(tree, cont.trait, model = "BM")
+    alt.tree <- BranchScaling(tree,scaling.factor = scaling.factor,cont.trait.AC)
+    # next we simulated a discrete trait on this altered tree
+    # while loop is set up to make sure sufficient transitions occur on the tree
+    good.sim <- F
+    while(good.sim == F){
+      disc.trait <- sim.char(phy = alt.tree,
+                             par = matrix(c(-rate, 0, rate, 0), 2),
+                             model = 'discrete',
+                             root = 1)
+      if((0.05 * n.taxa) < sum(disc.trait == min(disc.trait)) && 
+         sum(disc.trait == min(disc.trait)) < (.95 * n.taxa)){
+        good.sim <- T
+      }
     }
+    # creating the discretized cont trait for pagels test
+    mdn <- summary(cont.trait)[3]
+    disc.cont.trait <- cont.trait > mdn
+    disc.cont.trait <- as.character(as.vector(disc.cont.trait) + 1)
+    disc.trait <- as.vector(as.character(disc.trait))
+    names(disc.cont.trait) <- names(disc.trait) <- trees$tip.label
+    # doing pagels test
+    pagel <- fitPagel(trees, disc.trait, disc.cont.trait, method = 'fitDiscrete')$P
+    
+    # threshold test
+    X <- cbind((as.numeric(disc.trait) - 1),as.vector(cont.trait))
+    colnames(X) <- c('disc.trait', 'cont.trait')
+    row.names(X) <- trees$tip.label
+    X <- as.matrix(X)
+    sample <- 1000 # sample every 1000 steps
+    ngen <- 50000 # chain length, > 2 million is suggested
+    burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
+    thresh <- threshBayes(trees, X, ngen = ngen,
+                          control = list(sample = sample))
+    thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
+    class(thresh1) <- 'mcmc'
+    thresh2 <- HPDinterval(thresh1)
+    if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
+    if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
+    
+    dat <- data.frame(tree$tip.label, cont.trait, disc.trait)
+    anccond <- AncCond(tree = trees, 
+                       data = dat, 
+                       drop.state = 2, 
+                       mat = c(0,0,1,0), 
+                       pi = c(1,0), 
+                       message = T)$pval
+    results <- c((pagel < 0.05), thresh3, anccond)
+    
+
+    pval.array[t,] <- results
+    rm(thresh,thresh1,thresh2,thresh3)
   }
-  # creating the discretized cont trait for pagels test
-  mdn <- summary(cont.trait)[3]
-  disc.cont.trait <- cont.trait > mdn
-  disc.cont.trait <- as.character(as.vector(disc.cont.trait) + 1)
-  disc.trait <- as.vector(as.character(disc.trait))
-  names(disc.cont.trait) <- names(disc.trait) <- trees$tip.label
-  # doing pagels test
-  pagel <- fitPagel(trees, disc.trait, disc.cont.trait, method = 'fitDiscrete')$P
-  
-  # threshold test
-  X <- cbind((as.numeric(disc.trait) - 1),as.vector(cont.trait))
-  colnames(X) <- c('disc.trait', 'cont.trait')
-  row.names(X) <- trees$tip.label
-  X <- as.matrix(X)
-  sample <- 1000 # sample every 1000 steps
-  ngen <- 50000 # chain length, > 2 million is suggested
-  burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
-  thresh <- threshBayes(trees, X, ngen = ngen,
-                        control = list(sample = sample))
-  thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
-  class(thresh1) <- 'mcmc'
-  thresh2 <- HPDinterval(thresh1)
-  if(sign(thresh2[1,1]) == sign(thresh2[1,2])){thresh3 <- T}
-  if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
-  
-  dat <- data.frame(tree$tip.label, cont.trait, disc.trait)
-  anccond <- AncCond(tree = trees, 
-                  data = dat, 
-                  drop.state = 2, 
-                  mat = c(0,0,1,0), 
-                  pi = c(1,0), 
-                  message = T)$pval
-  results <- c((pagel < 0.05), thresh3, anccond)
-  
-  results
-  pval.array[t,] <- results
-  rm(thresh,thresh1,thresh2,thresh3)
+  if(scaling.factor == 1) save(pval.array, file = 'Pagel.Threshold.fpresults.RData')
+  if(scaling.factor == 5) save(pval.array, file = 'Pagel.Threshold.powerresults.RData')
 }
 
 pagel <- sum(pval.array[,1])

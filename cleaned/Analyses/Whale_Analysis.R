@@ -2,7 +2,7 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
 
 tree <- read.tree(file = 'Data/whales.tre')
@@ -10,12 +10,12 @@ tree$edge.length <- tree$edge.length / max(branching.times(tree))
 sizes <- read.csv('Data/whale_sizes.csv')
 source('AncCond.R')
 
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoMC(3)
 
-
+rate <- .3
 reordered.sizes <- rep(NA, length = length(tree$tip.label))
 names(reordered.sizes) <- tree$tip.label
 for(i in 1:length(sizes$Australophocaena.dioptrica)){
@@ -29,7 +29,6 @@ tree <- keep.tip(tree, names(reordered.sizes))
 sig.vector <- foreach(i = 1:300, .options.multicore=opts, .combine = 'c', 
                       .packages=c("phytools","diversitree","geiger")) %dopar% {
                         good.sim <- F
-                        rate <- .1
                         while(good.sim == F){
                           disc.trait <- sim.char(phy = tree,
                                                  par = matrix(c(-rate, 0, rate, 0), 2),

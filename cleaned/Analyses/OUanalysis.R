@@ -5,19 +5,19 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
 library(OUwie)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+#cl<-makeCluster(3, type="SOCK")
+#on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoMC(3)
 
-n.trees <- 2
-n.taxa <- 40
+n.trees <- 100
+n.taxa <- 200
 message <- T
 rate <- .6
-source('AncCond2.R')
+source('AncCond.R')
 
 
 p.vals <- array(dim = c(n.trees,3))
@@ -90,3 +90,4 @@ p.vals <- foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind',
                     results
                     
                   }
+save(p.vsls, file = 'OUresults.RData')

@@ -15,9 +15,9 @@ registerDoMC(5)
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond2.R', local = TRUE)
-scaling.factors <- c(1, 2, 5, 10)
-rate <- .4
+source('AncCond.R', local = TRUE)
+scaling.factors <- c(1, 2, 5, 8, 10)
+rate <- .6
 
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
@@ -122,4 +122,4 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                         p.val.vec
                       }
 scaling.bi.results <- p.val.array
-## save(scaling.bi.results, file = 'BidirectionalScalingAnalysis.RData')
+save(scaling.bi.results, file = 'BidirectionalScalingAnalysis.RData')

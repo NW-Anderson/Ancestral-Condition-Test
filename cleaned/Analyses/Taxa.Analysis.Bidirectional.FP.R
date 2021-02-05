@@ -3,17 +3,17 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoSNOW(3)
 
 
 n.trees <- 100
 scale.factor <- 1
-n.taxa <- seq(20, 200, length.out = 10)
+n.taxa <- c(20,50,100,150,200)
 source('AncCond.R', local = TRUE)
 message <- T
 

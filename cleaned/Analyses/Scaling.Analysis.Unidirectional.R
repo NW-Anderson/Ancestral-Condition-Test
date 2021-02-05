@@ -7,19 +7,19 @@ library(R.utils)
 library(phytools)
 library(diversitree)
 library(geiger)
-library(doSNOW)
+library(doMC)
 library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+registerDoMC(3)
 
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond2.R', local = TRUE) 
+source('AncCond.R', local = TRUE) 
 scaling.factors <- c(1)
-rate <- .2
+rate <- .3
 
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors

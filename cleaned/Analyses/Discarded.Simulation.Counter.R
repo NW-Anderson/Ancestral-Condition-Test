@@ -9,6 +9,7 @@ on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
 registerDoSNOW(cl)
 
+rate <- .3
 n.trees <- 100
 n.taxa <- 200
 message <- T
@@ -80,7 +81,6 @@ for(i in 1:100){
     # while loop is set up to make sure sufficient transitions occur on the tree
     good.sim <- F
     bad.count <- 0
-    rate <- .1
     while(good.sim == F){
       disc.trait <- sim.char(phy = alt.tree,
                              par = matrix(c(-rate, 0, rate, 0), 2),
@@ -176,7 +176,6 @@ for(s in 1:10){
     good.sim <- F
     # count <- 0
     bad.count <- 0
-    rate <- .1
     # withTimeout({
     while(good.sim == F){
       disc.trait <- sim.char(phy = alt.tree, 
