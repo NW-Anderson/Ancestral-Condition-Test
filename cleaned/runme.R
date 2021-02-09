@@ -7,7 +7,7 @@ library(foreach)
 # cl<-makeCluster(3, type="SOCK")
 # on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
-registerDoSNOW(3)
+registerDoMC(3)
 
 source('./Analyses/Discarded.Simulations.Counter.R')
 rm(list = ls())
