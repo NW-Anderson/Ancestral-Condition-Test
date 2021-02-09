@@ -1,19 +1,19 @@
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doSNOW)
-library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoSNOW(3)
 
 rate <- .2
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 percent.vec <- array(dim = c(100,10))
 for(i in 1:100){
   

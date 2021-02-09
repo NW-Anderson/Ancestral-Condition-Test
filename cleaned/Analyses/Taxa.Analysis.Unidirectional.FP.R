@@ -1,14 +1,14 @@
 # this is the exact same as FIG3 but with a scaling factor of 1 to find fp rate
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doMC)
-library(foreach)
-# cl<-makeCluster(3, type="SOCK")
-# on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoSNOW(3)
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoSNOW(3)
 
 
 
@@ -16,7 +16,7 @@ n.trees <- 100
 scale.factor <- 1
 n.taxa <- c(20,50,100,150,200)
 message <- T
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 rate <- .2
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes

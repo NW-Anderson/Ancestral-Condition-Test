@@ -1,21 +1,21 @@
 # install.packages("phytools")
-# install.packages("diversitree")
-# install.packages("geiger")
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doMC)
-library(foreach)
-# cl<-makeCluster(3, type="SOCK")
-# on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoMC(5)
+# # install.packages("diversitree")
+# # install.packages("geiger")
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoMC(5)
 
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 scaling.factors <- c(1, 2, 5, 8, 10)
 rate <- .6
 

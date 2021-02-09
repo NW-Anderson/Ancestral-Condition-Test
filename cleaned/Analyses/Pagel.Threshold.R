@@ -50,25 +50,25 @@ BranchScaling <- function(tree, scaling.factor, cont.trait.AC){
 #####
 # install.packages("phytools")
 # install.packages("diversitree")
-# install.packages("geiger")
-# install.packages("coda")
-library(coda)
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doMC)
-library(foreach)
-# cl<-makeCluster(3, type="SOCK")
-# on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoMC(3)
+# # install.packages("geiger")
+# # install.packages("coda")
+# library(coda)
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoMC(3)
 
 rate <- .2
 n.trees <- 100
 n.taxa <- 200
 message <- T
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 
 
 for(scaling.factor in c(1,5)){

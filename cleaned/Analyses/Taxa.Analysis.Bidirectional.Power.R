@@ -1,23 +1,23 @@
 
 # install.packages("phytools")
-# install.packages("diversitree")
-# install.packages("geiger")
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doSNOW)
-library(foreach)
-cl<-makeCluster(3, type="SOCK")
-on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoSNOW(cl)
+# # install.packages("diversitree")
+# # install.packages("geiger")
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doSNOW)
+# library(foreach)
+# cl<-makeCluster(3, type="SOCK")
+# on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoSNOW(cl)
 
 
 n.trees <- 100
 scale.factor <- 5
 n.taxa <- c(20,50,100,150,200)
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 message <- T
 rate <- .6
 

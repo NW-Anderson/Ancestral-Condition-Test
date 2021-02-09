@@ -1,20 +1,20 @@
 
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doMC)
-library(foreach)
-# cl<-makeCluster(3, type="SOCK")
-# on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoSNOW(3)
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoSNOW(3)
 
 
 n.trees <- 100
 scale.factor <- 1
 n.taxa <- c(20,50,100,150,200)
-source('AncCond.R', local = TRUE)
+source('./PackageFunctions/AncCond.R', local = TRUE)
 message <- T
 
 rate <- .6

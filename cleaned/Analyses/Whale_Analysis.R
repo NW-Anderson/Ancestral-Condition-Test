@@ -1,19 +1,20 @@
-library(R.utils)
-library(phytools)
-library(diversitree)
-library(geiger)
-library(doMC)
-library(foreach)
+# library(R.utils)
+# library(phytools)
+# library(diversitree)
+# library(geiger)
+# library(doMC)
+# library(foreach)
+# # cl<-makeCluster(3, type="SOCK")
+# # on.exit(stopCluster(cl))
+# opts <- list(preschedule = FALSE)
+# registerDoMC(3)
 
 tree <- read.tree(file = 'Data/whales.tre')
 tree$edge.length <- tree$edge.length / max(branching.times(tree))
 sizes <- read.csv('Data/whale_sizes.csv')
-source('AncCond.R')
+source('./PackageFunctions/AncCond.R')
 
-# cl<-makeCluster(3, type="SOCK")
-# on.exit(stopCluster(cl))
-opts <- list(preschedule = FALSE)
-registerDoMC(3)
+
 
 rate <- .2
 reordered.sizes <- rep(NA, length = length(tree$tip.label))

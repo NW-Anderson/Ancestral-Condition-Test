@@ -10,7 +10,7 @@
 
 
 
-source('internal.functions.R')
+source('./PackageFunctions/internal.functions.R')
 
 AncCond <- function(tree, # phylo object
                     data, # dataframe 3 columns species names, continuous, discrete
