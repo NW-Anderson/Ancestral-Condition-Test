@@ -19,7 +19,7 @@ n.taxa <- 200
 message <- T
 source('AncCond.R', local = TRUE) 
 scaling.factors <- c(1)
-rate <- .3
+rate <- .2
 
 # we do the following for each of 200 trees
 # this will hold the p.val for each of 200 tests for the 10 scaling factors
@@ -114,7 +114,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           drop.state = 2, 
-                                          mat = c(0,0,1,0), 
+                                          model = 'UNI', 
                                           pi = c(1,0), 
                                           message = T)
                           p.val.vec[s] <- rslt$pval

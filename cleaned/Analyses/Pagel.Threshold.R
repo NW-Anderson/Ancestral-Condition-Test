@@ -64,7 +64,7 @@ library(foreach)
 opts <- list(preschedule = FALSE)
 registerDoMC(3)
 
-rate <- .3
+rate <- .2
 n.trees <- 100
 n.taxa <- 200
 message <- T
@@ -133,7 +133,7 @@ for(scaling.factor in c(1,5)){
     anccond <- AncCond(tree = trees, 
                        data = dat, 
                        drop.state = 2, 
-                       mat = c(0,0,1,0), 
+                       model = 'UNI', 
                        pi = c(1,0), 
                        message = T)$pval
     results <- c((pagel < 0.05), thresh3, anccond)

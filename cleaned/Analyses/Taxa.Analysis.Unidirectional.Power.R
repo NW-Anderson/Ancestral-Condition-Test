@@ -20,7 +20,7 @@ scale.factor <- 5
 n.taxa <- c(20,50,100,150,200)
 message <- T
 source('AncCond.R', local = TRUE)
-rate <- .3
+rate <- .2
 
 ## this will hold the p.val for each of 100 tests for the 10 tree sizes
 p.val.array <- array(dim = c(n.trees, 10))
@@ -111,7 +111,7 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           rslt <- AncCond(tree = trees, 
                                           data = dat, 
                                           drop.state = 2, 
-                                          mat = c(0,0,1,0), 
+                                          model = 'UNI', 
                                           pi = c(1,0), 
                                           message = T)
                           

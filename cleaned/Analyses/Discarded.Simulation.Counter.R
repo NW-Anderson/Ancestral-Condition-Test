@@ -9,7 +9,7 @@ on.exit(stopCluster(cl))
 opts <- list(preschedule = FALSE)
 registerDoSNOW(cl)
 
-rate <- .3
+rate <- .2
 n.trees <- 100
 n.taxa <- 200
 message <- T

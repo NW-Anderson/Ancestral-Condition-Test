@@ -15,7 +15,7 @@ source('AncCond.R')
 opts <- list(preschedule = FALSE)
 registerDoMC(3)
 
-rate <- .3
+rate <- .2
 reordered.sizes <- rep(NA, length = length(tree$tip.label))
 names(reordered.sizes) <- tree$tip.label
 for(i in 1:length(sizes$Australophocaena.dioptrica)){
@@ -44,7 +44,7 @@ sig.vector <- foreach(i = 1:300, .options.multicore=opts, .combine = 'c',
                         rslt <- AncCond(trees = tree, 
                                         data = dat, 
                                         drop.state = 2, 
-                                        mat = c(0,0,1,0), 
+                                        model = 'UNI', 
                                         pi = c(1,0), 
                                         message = T)
                         rslt$pval < .05
