@@ -1,0 +1,62 @@
+---
+title: "AncCond Practice"
+author: "Nathan"
+date: "11/3/2021"
+output: pdf_document
+vignette: > 
+  %\VignetteIndexEntry{figures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Documents/GitHub/Ancestral-Condition-Test/cleaned")
+```
+
+## Introduction
+
+First let's load in an example phylogeny.
+
+```{r}
+library(phytools)
+tree <- read.tree(file = 'Data/whales.tre')
+plot(tree, cex = 0.25)
+```
+That's a lot of whales!
+
+Wonder how big they are, let's import thier weights.
+
+```{r}
+load(file = 'Data/exampleSizeData.RData')
+length(sizedata)
+length(tree$tip.label)
+```
+We dont have size data for all of the species!
+
+lets fix that
+
+```{r}
+tree <- keep.tip(tree, names(sizedata))
+plot(tree, cex = 0.25)
+```
+The sizes are our continious trait.
+
+Lets perform an ancestral state estimation on the size data of extant whales.
+
+```{r}
+contMap(tree,sizedata, fsize = 0.5)
+# , ftype = 'off', legend = F, lims = c(.24,2), plot = F)
+# n<-length(smp$cols)
+# smp$cols[1:n]<-rainbow(n, end = 4/6)
+# plot(smp, legend = F,ftype = 'off')
+```
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
