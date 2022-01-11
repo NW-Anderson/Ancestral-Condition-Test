@@ -7,7 +7,7 @@
 # library(foreach)
 # # cl<-makeCluster(3, type="SOCK")
 # # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoSNOW(3)
 
 
@@ -110,11 +110,8 @@ p.val.array <-foreach(s = 1:length(n.taxa), .options.multicore=opts, .combine = 
                           rslt <- AncCond(tree = tree, 
                                           data = data, 
                                           model = 'UNI', 
-                                          drop.state = drop.state,
+                                          drop.state = 2,
                                           pi = c(1,0), 
-                                          nsim = nsim,
-                                          iter = iter,
-                                          n.tails = n.tails,
                                           message = T)
                           
                           if(message == T){cat('\n')}

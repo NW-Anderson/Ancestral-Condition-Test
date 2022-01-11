@@ -9,7 +9,7 @@
 # library(foreach)
 # # cl<-makeCluster(3, type="SOCK")
 # # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoMC(5)
 
 n.trees <- 100
@@ -109,8 +109,7 @@ p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind'
                           dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
                           rslt <- AncCond(tree = trees, 
                                           data = dat, 
-                                          message = T,
-                                          nsim = 50)
+                                          message = T)
                           p.val.vec[s] <- paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ',')
                           if(message == T){cat(' s = ', s)}
                         }

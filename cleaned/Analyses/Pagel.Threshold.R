@@ -1,5 +1,5 @@
 ##### Internal functions ######
-BranchScaling <- function(tree, scaling.factor, cont.trait.AC){
+BranchScaling <- function(tree, scale.factor, cont.trait.AC){
   # this will hold all of the branch means in the same order they are given in trees
   branch.means <- c()
   # branch names is essentially paste(rootward node, tipward node)
@@ -36,7 +36,6 @@ BranchScaling <- function(tree, scaling.factor, cont.trait.AC){
   
   # next we perform the following analysis on this tree for each of the scaling factors
   
-  scale.factor <- 1
   # we leave the original trees un altered 
   alt.tree <- tree 
   
@@ -61,7 +60,8 @@ BranchScaling <- function(tree, scaling.factor, cont.trait.AC){
 # library(foreach)
 # # cl<-makeCluster(3, type="SOCK")
 # # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+library(coda)
+opts <- list(preschedule = FALSE)
 # registerDoMC(3)
 
 rate <- .2
@@ -71,11 +71,13 @@ message <- T
 source('./PackageFunctions/AncCond.R', local = TRUE)
 
 
-for(scaling.factor in c(1,5)){
+for(scale.factor in c(1,5)){
   pval.array <- p.val.array <- array(dim = c(n.trees, 3))
   
   
-  for(t in 1:n.trees){
+  # for(t in 1:n.trees){
+  p.val.array <-foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind', 
+                        .packages=c("phytools","diversitree","geiger", "coda")) %dopar%{
     tree <- trees(pars = c(3,1),
                   type = "bd",
                   n = 1,
@@ -90,7 +92,7 @@ for(scaling.factor in c(1,5)){
     # identifying which branch had a mean cont trait value in the upper and lower quartiles
     # we do this by 1st doing an ASR for the continious trait
     cont.trait.AC <- anc.ML(tree, cont.trait, model = "BM")
-    alt.tree <- BranchScaling(tree,scaling.factor = scaling.factor,cont.trait.AC)
+    alt.tree <- BranchScaling(tree,scale.factor = scale.factor,cont.trait.AC)
     # next we simulated a discrete trait on this altered tree
     # while loop is set up to make sure sufficient transitions occur on the tree
     good.sim <- F
@@ -109,19 +111,19 @@ for(scaling.factor in c(1,5)){
     disc.cont.trait <- cont.trait > mdn
     disc.cont.trait <- as.character(as.vector(disc.cont.trait) + 1)
     disc.trait <- as.vector(as.character(disc.trait))
-    names(disc.cont.trait) <- names(disc.trait) <- trees$tip.label
+    names(disc.cont.trait) <- names(disc.trait) <- tree$tip.label
     # doing pagels test
-    pagel <- fitPagel(trees, disc.trait, disc.cont.trait, method = 'fitDiscrete')$P
+    pagel <- fitPagel(tree, disc.trait, disc.cont.trait, method = 'fitDiscrete')$P
     
     # threshold test
     X <- cbind((as.numeric(disc.trait) - 1),as.vector(cont.trait))
     colnames(X) <- c('disc.trait', 'cont.trait')
-    row.names(X) <- trees$tip.label
+    row.names(X) <- tree$tip.label
     X <- as.matrix(X)
     sample <- 1000 # sample every 1000 steps
     ngen <- 50000 # chain length, > 2 million is suggested
     burnin <- 0.2 * ngen # 20% of all data is discarded as burnin
-    thresh <- threshBayes(trees, X, ngen = ngen,
+    thresh <- threshBayes(tree, X, ngen = ngen,
                           control = list(sample = sample))
     thresh1 <- thresh$par[(burnin/sample + 1):nrow(thresh$par), "r"]
     class(thresh1) <- 'mcmc'
@@ -130,7 +132,7 @@ for(scaling.factor in c(1,5)){
     if(sign(thresh2[1,1]) != sign(thresh2[1,2])){thresh3 <- F}
     
     dat <- data.frame(tree$tip.label, cont.trait, disc.trait)
-    anccond <- AncCond(tree = trees, 
+    anccond <- AncCond(tree = tree, 
                        data = dat, 
                        drop.state = 2, 
                        model = 'UNI', 
@@ -139,11 +141,12 @@ for(scaling.factor in c(1,5)){
     results <- c((pagel < 0.05), thresh3, anccond)
     
 
-    pval.array[t,] <- results
+    # pval.array[t,] <- results
     rm(thresh,thresh1,thresh2,thresh3)
+    results
   }
-  if(scaling.factor == 1) save(pval.array, file = 'Pagel.Threshold.fpresults.RData')
-  if(scaling.factor == 5) save(pval.array, file = 'Pagel.Threshold.powerresults.RData')
+  if(scale.factor == 1) save(pval.array, file = 'Pagel.Threshold.fpresults.RData')
+  if(scale.factor == 5) save(pval.array, file = 'Pagel.Threshold.powerresults.RData')
 }
 
 pagel <- sum(pval.array[,1])

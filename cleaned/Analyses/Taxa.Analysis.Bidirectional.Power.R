@@ -10,7 +10,7 @@
 # library(foreach)
 # cl<-makeCluster(3, type="SOCK")
 # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoSNOW(cl)
 
 

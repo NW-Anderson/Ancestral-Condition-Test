@@ -8,7 +8,8 @@ InputTesting <- function(tree,
                          pi,
                          n.tails,
                          nsim,
-                         iter){
+                         iter,
+                         model){
   ##### testing inputs #####
   
   if(class(tree) != 'phylo') {stop('tree must be class phylo')}
@@ -136,10 +137,10 @@ ProcessObserved <- function(anc.state.dt, nsim,
       current.map <- anc.state.dt
     }else{current.map <- anc.state.dt[[j]]}
     if(message){
-      cat('\014')
+      # cat('\014')
       cat('Analyzing map: ',j,' of ', nsim, "\n")
     }
-    qmats[[j]] <- anc.state.dt[[j]]$Q
+    qmats[[j]] <- current.map$Q
     observed.anc.cond[[j]] <- exctractAncestral(current.map = current.map,
                                                 anc.states.cont.trait, count = T)
     trans12 <- observed.anc.cond[[j]]$ntrans[1]
@@ -190,7 +191,7 @@ CreateNull <- function(tree,                     # a tree type phylo
       sim.count <- 0
       TO <- F
       while(good.sim == F && TO == F){
-        if(sim.count %% 50 == 0) print(sim.count)
+        # if(sim.count %% 50 == 0) print(sim.count)
         sim.count <- sim.count + 1
         sim.anc.state.dt <- sim.history(tree=tree, Q=current.Q,
                                         nsim=1, message = F,

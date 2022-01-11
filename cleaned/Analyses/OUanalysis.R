@@ -10,7 +10,7 @@
 # library(OUwie)
 # #cl<-makeCluster(3, type="SOCK")
 # #on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoMC(3)
 
 n.trees <- 100
@@ -90,4 +90,4 @@ p.vals <- foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind',
                     results
                     
                   }
-save(p.vsls, file = 'OUresults.RData')
+save(p.vals, file = 'OUresults.RData')

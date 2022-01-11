@@ -6,7 +6,7 @@
 # library(foreach)
 # # cl<-makeCluster(3, type="SOCK")
 # # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoMC(3)
 
 tree <- read.tree(file = 'Data/whales.tre')

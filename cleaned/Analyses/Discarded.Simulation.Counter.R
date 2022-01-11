@@ -6,7 +6,7 @@
 # library(foreach)
 # # cl<-makeCluster(3, type="SOCK")
 # # on.exit(stopCluster(cl))
-# opts <- list(preschedule = FALSE)
+opts <- list(preschedule = FALSE)
 # registerDoSNOW(3)
 
 rate <- .2
@@ -101,12 +101,12 @@ for(i in 1:10){
   total.bad[i] <- sum(percent.vec[,i])
 }
 final.prop <- total.bad / total.sims
-# save(final.prop, file = 'PercentDiscardedScaling.RData')
+save(final.prop, file = 'PercentDiscardedScaling.RData')
 
 n.trees <- 100
 scale.factor <- 5
 n.taxa <- seq(20, 200, length.out = 10)
-source('AncCond.R', local = TRUE)
+# source('AncCond.R', local = TRUE)
 message <- T
 percent.vec <- array(dim = c(100,10))
 
@@ -196,4 +196,4 @@ for(i in 1:10){
   total.bad[i] <- sum(percent.vec[,i])
 }
 final.prop <- total.bad / total.sims
-# save(final.prop, file = 'PercentDiscardedTaxa.RData')
+save(final.prop, file = 'PercentDiscardedTaxa.RData')

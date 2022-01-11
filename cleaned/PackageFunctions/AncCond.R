@@ -29,7 +29,7 @@ AncCond <- function(tree, # phylo object
   # This will generate warnings and stop if we violate
   # any basic assumptions on incoming data
   InputTesting(tree, data, drop.state, mat,
-               pi, n.tails, nsim, iter)
+               pi, n.tails, nsim, iter, model)
 
   # convert input tree to unit length
   tree$edge.length <- tree$edge.length / max(branching.times(tree))
@@ -53,12 +53,12 @@ AncCond <- function(tree, # phylo object
                               pi = pi,
                               Q = 'mcmc',
                               message = message)
-
+  if(message) cat("Processing simulated mappings:\n")
   observed <- ProcessObserved(anc.state.dt = anc.state.dt,
                               nsim = nsim,
                               anc.states.cont.trait = anc.states.cont.trait,
                               message = message)
-
+  if(message) cat("Creating null:\n")
   null <- CreateNull(tree,                     # a tree type phylo
                      iter,                     # number of simulations for null
                      anc.states.cont.trait = anc.states.cont.trait,   # ancestral state reconstruction for continuous
