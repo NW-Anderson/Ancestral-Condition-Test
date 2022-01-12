@@ -105,8 +105,8 @@ for(s in 1:length(n.taxa)){
                          if(message == T){cat('\n')}
                          # we now apply the AncCond test to our simulated data and record its result
                          dat <- data.frame(alt.tree$tip.label, cont.trait, disc.trait)
-                         rslt <- AncCond(tree = tree, 
-                                         data = data, 
+                         rslt <- AncCond(tree = trees, 
+                                         data = dat, 
                                          model = 'UNI', 
                                          drop.state = 2,
                                          pi = c(1,0), 

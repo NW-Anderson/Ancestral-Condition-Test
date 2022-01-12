@@ -119,7 +119,7 @@ for(s in 1:length(n.taxa)){
                            cat('\n')
                            cat(' t = ', t)
                          }
-                         p.varslt$pvals[1]
+                         rslt$pvals[1]
                        }
   if(message == T){
     cat('\n')

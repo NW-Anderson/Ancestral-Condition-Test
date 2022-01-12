@@ -42,7 +42,7 @@ sig.vector <- foreach(i = 1:300, .options.multicore=opts, .combine = 'c',
                         }
                         
                         dat <- data.frame(tree$tip.label, reordered.sizes, disc.trait)
-                        rslt <- AncCond(trees = tree, 
+                        rslt <- AncCond(tree = tree, 
                                         data = dat, 
                                         drop.state = 2, 
                                         model = 'UNI', 

@@ -118,8 +118,8 @@ for(s in 1:length(n.taxa)){
       cat('\n')
       cat(' t = ', t)
     }
-    paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ',')
-    if(message == T){cat(' s = ', s)}
+    return(paste(rslt$`pvals`[1],rslt$`pvals`[2],sep = ','))
+   
   }
   if(message == T){
     cat('\n')
