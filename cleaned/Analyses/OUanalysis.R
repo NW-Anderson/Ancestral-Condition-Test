@@ -16,7 +16,7 @@ opts <- list(preschedule = FALSE)
 n.trees <- 100
 n.taxa <- 200
 message <- T
-rate <- .6
+rate <- .2
 source('./PackageFunctions/AncCond.R')
 
 
@@ -40,7 +40,7 @@ p.vals <- foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind',
                     while(good.sim == F){
                       
                       anc.state.dt <- sim.history(tree=tree,
-                                                  Q=matrix(c(-rate, rate, rate, -rate), 2,2),
+                                                  Q=matrix(c(-rate, 10^(-25), rate, -10^(-25)), 2,2),
                                                   nsim=1)
                       
                       if((0.05 * n.taxa) < sum(anc.state.dt$states == min(anc.state.dt$states)) &&
@@ -53,8 +53,8 @@ p.vals <- foreach(t = 1:n.trees, .options.multicore=opts, .combine = 'rbind',
                                             simmap.tree = T,
                                             alpha = c(1,1),
                                             sigma.sq = c(.75,.75),
-                                            theta0 = 2.5,
-                                            theta = c(1,5))
+                                            theta0 = 1,
+                                            theta = c(1,9))
                     tip.data <- cont.trait$X
                     names(tip.data) <- cont.trait$Genus_species
                     contMap(tree, x=tip.data)
